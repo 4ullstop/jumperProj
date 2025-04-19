@@ -1,28 +1,78 @@
+#include <windows.h>
+#include <xinput.h> 
+
 #include "win32_jumper.h"
-
-
-
-#define local_persist static
-#define global_variable static
-#define internal static
-
-typedef int8_t i8;
-typedef int16_t i16;
-typedef int32_t i32;
-typedef int64_t i64;
-
-typedef i32 bool32;
-
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
 
 global_variable bool32 running;
 global_variable win32_offscreen_buffer globalBackBuffer;
 
-//Update buffer
-//Edit buffer
+
+#define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex, XINPUT_STATE* pState)
+typedef X_INPUT_GET_STATE(x_input_get_state);
+X_INPUT_GET_STATE(XInputGetStateStub)
+{
+    return(ERROR_DEVICE_NOT_CONNECTED);
+}
+global_variable x_input_get_state* XInputGetState_ = XInputGetStateStub;
+#define XInputGetState XInputGetState_
+
+#define X_INPUT_SET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex, XINPUT_STATE* pState)
+typedef X_INPUT_SET_STATE(x_input_set_state);
+X_INPUT_SET_STATE(XInputSetStateStub)
+{
+    return(ERROR_DEVICE_NOT_CONNECTED);
+}
+global_variable x_input_set_state* XInputSetState_ = XInputSetStateStub;
+#define XInputSetState XInputSetState_
+
+internal void
+Win32LoadXInput(void)
+{
+    HMODULE XInputLibrary = LoadLibrary("xinput1_4.dll");
+    if (!XInputLibrary)
+    {
+	XInputLibrary = LoadLibrary("xinput9_1_0.dll");
+    }
+    if (!XInputLibrary)
+    {
+	XInputLibrary = LoadLibrary("xinput1_3.dll");
+    }
+    if (XInputLibrary)
+    {
+	XInputGetState = (x_input_get_state*)GetProcAddress(XInputLibrary, "XInputGetState");
+	XInputSetState = (x_input_set_state*)GetProcAddress(XInputLibrary, "XInputSetState");
+
+	OutputDebugString("Library is loaded, functions should be set\n");
+    }
+    else
+    {
+	
+    }
+}
+
+//Accounting for dead zone calculations
+internal r32
+Win32ProcessInputStickValue(SHORT value, SHORT deadZoneThreshold)
+{
+    r32 result = 0;
+
+    if (value < -deadZoneThreshold)
+    {
+	result = (r32)((value + deadZoneThreshold) / (32768.0f - deadZoneThreshold));
+    }
+    else if (value > deadZoneThreshold)
+    {
+	result = (r32)((value - deadZoneThreshold) / (32767.0f - deadZoneThreshold));
+    }
+    return(result);
+}
+
+internal void
+Win32ProcessXInputDigitalButton(DWORD xInputButtonState, game_button_state* oldState, DWORD buttonBit, game_button_state* newState)
+{
+    newState->endedDown = ((xInputButtonState & buttonBit) == buttonBit);
+    newState->halfTransitionCount = (newState->endedDown != oldState->endedDown) ? 1 : 0;
+}
 
 internal void
 RenderGradient(win32_offscreen_buffer* buffer, int xOffset, int yOffset)
@@ -177,6 +227,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		     int nCmdShow)
 {
 
+    Win32LoadXInput();
+    
     Win32ResizeDIBSection(&globalBackBuffer, 960, 540);
     WNDCLASS wc = {};
     wc.style = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
@@ -201,10 +253,12 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    0);
 	if (window)
 	{
-	    running = true;
-	    //Virtual alloc here
-	    //TODO: evetually we will want this to align at some desired spot so we can get the same addresses each time the game is run.
+
+	    game_input input[2] = {};
+	    game_input* newInput = &input[0];
+	    game_input* oldInput = &input[1];
 	    
+	    running = true;
 	    while (running)
 	    {
 		MSG msg;
@@ -214,13 +268,89 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		    TranslateMessage(&msg);		    
 		}
 
-		win32_window_dimension dimension = Win32GetWindowDimension(window);
+		DWORD maxControllerCount = XUSER_MAX_COUNT;
 
-		RenderGradient(&globalBackBuffer, 0, 0);
+		
+		for (DWORD controllerIndex = 0; controllerIndex <  maxControllerCount; ++controllerIndex)
+		{
+		    int ourControllerIndex = controllerIndex + 1;
+		    game_controller_input* oldController = GetController(oldInput, ourControllerIndex);
+		    game_controller_input* newController = GetController(newInput, ourControllerIndex);
+		    XINPUT_STATE controllerState;
+
+		    if (XInputGetState(controllerIndex, &controllerState) == ERROR_SUCCESS)
+		    {
+			newController->isConnected = true;
+			newController->isAnalog = oldController->isAnalog;
+
+			XINPUT_GAMEPAD* pad = &controllerState.Gamepad;
+
+			newController->isAnalog = true;
+			newController->stickAverageX = Win32ProcessInputStickValue(pad->sThumbLX,
+										   XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+			newController->stickAverageY = Win32ProcessInputStickValue(pad->sThumbLY,
+										   XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+			if ((newController->stickAverageX != 0.0f) ||
+			    (newController->stickAverageY != 0.0f))
+			{
+			    newController->isAnalog = true;
+			}
+			if (pad->wButtons & XINPUT_GAMEPAD_DPAD_UP)
+			{
+			    newController->stickAverageY = 1.0f;
+			    newController->isAnalog = false;
+			}
+			if (pad->wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
+			{
+			    newController->stickAverageY = -1.0f;
+			    newController->isAnalog = false;
+			}
+			if (pad->wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
+			{
+			    newController->stickAverageX = -1.0f;
+			    newController->isAnalog = false;
+			}
+			if (pad->wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
+			{
+			    newController->stickAverageX = 1.0f;
+			    newController->isAnalog = false;
+			}
+			r32 threshold = 0.5f;
+
+			Win32ProcessXInputDigitalButton((newController->stickAverageX < -threshold) ? 1 : 0,
+							&oldController->moveLeft, 1,
+							&newController->moveLeft);
+			Win32ProcessXInputDigitalButton((newController->stickAverageX > threshold) ? 1 : 0,
+							&oldController->moveRight, 1,
+							&newController->moveRight);
+			Win32ProcessXInputDigitalButton((newController->stickAverageY < -threshold) ? 1 : 0,
+							&oldController->moveDown, 1,
+							&newController->moveDown);
+			Win32ProcessXInputDigitalButton((newController->stickAverageY > threshold) ? 1 : 0,
+							&oldController->moveUp, 1,
+							&newController->moveUp);			
+			
+		    }
+		}
+
+		i32 xOffset = 0;
+		game_controller_input* cont = GetController(newInput, 1);
+		if (cont->moveUp.endedDown)
+		{
+		    xOffset += 10;
+		    OutputDebugString("controller up button pressed\n");
+		}
+		
+		win32_window_dimension dimension = Win32GetWindowDimension(window);
+		RenderGradient(&globalBackBuffer, xOffset, 0);
 		
 		HDC deviceContext = GetDC(window);
 		Win32DisplayBufferWindow(&globalBackBuffer, deviceContext, 0, 0, dimension.width, dimension.height);
 		ReleaseDC(window, deviceContext);
+
+		game_input* temp = newInput;
+		newInput = oldInput;
+		oldInput = temp;
 	    }
 	}
     }
