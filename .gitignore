@@ -1,0 +1,4 @@
+.vs
+build/loop_edit.hmi
+*.hmi
+*.bmp
