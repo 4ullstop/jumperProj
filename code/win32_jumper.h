@@ -37,6 +37,11 @@ struct win32_window_dimension
     int height;
 };
 
+struct win32_audio_info
+{
+    IXAudio2* audioInterface;
+    IXAudio2MasteringVoice* audioMasterVoice;
+};
 
 struct game_button_state
 {
@@ -85,6 +90,15 @@ struct game_input
 
     r32 dTime;
     game_controller_input controllers[5];
+};
+
+struct win32_state
+{
+    u64 totalSize;
+    void* gameMemoryBlock;
+
+    HANDLE recordingIndex;
+    i32 inputRecordingIndex;
 };
 
 inline game_controller_input* GetController(game_input* input, int unsigned controllerIndex)

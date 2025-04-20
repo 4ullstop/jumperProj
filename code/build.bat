@@ -1,6 +1,6 @@
 @echo off
 
-set commonCompilerFlags= -MTd -nologo -fp:fast -Gm- -GR- -EHa- -Od -Oi -WX -W4 -wd4100 -wd4201 -wd4189 -wd4505 -DJUMPER_INTERNAL=1 -DJUMPER_SLOW=1 -DJUMPER_WIN32=1 -FC -Zi
+set commonCompilerFlags= -MTd -nologo -fp:fast -Gm- -GR- -EHa- -Od -Oi -WX -W4 -wd4100 -wd4201 -wd4189 -wd4505 -wd4101 -DJUMPER_INTERNAL=1 -DJUMPER_SLOW=1 -DJUMPER_WIN32=1 -FC -Zi
 
 set commonLinkerFlags= -incremental:no user32.lib gdi32.lib winmm.lib
 

@@ -1,11 +1,15 @@
 #include <windows.h>
-#include <xinput.h> 
+#include <xinput.h>
+#include <xaudio2.h>
 
 #include "win32_jumper.h"
 
+
+#define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
+
 global_variable bool32 running;
 global_variable win32_offscreen_buffer globalBackBuffer;
-
+global_variable bool32 pause;
 
 #define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex, XINPUT_STATE* pState)
 typedef X_INPUT_GET_STATE(x_input_get_state);
@@ -24,6 +28,57 @@ X_INPUT_SET_STATE(XInputSetStateStub)
 }
 global_variable x_input_set_state* XInputSetState_ = XInputSetStateStub;
 #define XInputSetState XInputSetState_
+
+#define X_AUDIO2_CREATE(name) HRESULT name(IXAudio2 **ppXAudio2, UINT32 Flags, XAUDIO2_PROCESSOR XAudio2Processor)
+typedef X_AUDIO2_CREATE(x_audio2_create);
+
+#define COINITIALIZE(name) HRESULT name(LPVOID pvReserved, DWORD dwCoInit)
+typedef COINITIALIZE(co_initialize);
+
+internal void
+Win32InitSound(win32_audio_info* audioInfo)
+{
+    HMODULE xAudioLibrary = LoadLibrary("XAudio2_9.dll");
+
+    HMODULE oleLibrary = LoadLibrary("Ole32.dll");
+    if (xAudioLibrary)
+    {
+	x_audio2_create* xAudio2Create = (x_audio2_create*)GetProcAddress(xAudioLibrary, "XAudio2Create");
+	
+	
+	if (xAudio2Create)
+	{
+	    
+	    if(xAudio2Create(&audioInfo->audioInterface, 0, XAUDIO2_DEFAULT_PROCESSOR) == S_OK)
+	    {
+		if (oleLibrary)
+		{
+		    co_initialize* coinitialize = (co_initialize*)GetProcAddress(oleLibrary, "CoInitializeEx");
+
+		    if (coinitialize(0, COINIT_MULTITHREADED) == S_OK)
+		    {
+			
+			if (audioInfo->audioInterface->CreateMasteringVoice(&audioInfo->audioMasterVoice,
+									    XAUDIO2_DEFAULT_CHANNELS,
+									    XAUDIO2_DEFAULT_SAMPLERATE,
+									    0,
+									    0) == S_OK)
+			{
+			    OutputDebugString("Audio Interface Mastering Voice created\n");
+			}
+			
+//			DWORD lastError = GetLastError();
+		    }
+		}
+	    }
+	    else
+	    {
+		OutputDebugString("Error, xAudio2 device not initialized\n");	    
+	    }
+	}
+    }
+    
+}
 
 internal void
 Win32LoadXInput(void)
@@ -221,12 +276,124 @@ LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
     return(result);
 }
 
+internal void
+Win32ProcessKeyboardMessage(game_button_state* newState, bool32 isDown)
+{
+    if (newState->endedDown != isDown)
+    {
+	newState->endedDown = isDown;
+	++newState->halfTransitionCount;
+    }
+}
+
+internal void
+Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyboardController)
+{
+    MSG msg;
+    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+    {
+	switch(msg.message)
+	{
+	case WM_QUIT:
+	{
+	    running = false;
+	} break;
+	case WM_SETCURSOR:
+	{
+	    
+	} break;
+	case WM_SYSKEYDOWN:
+	case WM_SYSKEYUP:
+	case WM_KEYDOWN:
+	case WM_KEYUP:
+	{
+	    u32 VKCode = (u32)msg.wParam;
+	    bool32 wasDown = ((msg.lParam & (1 << 30)) != 0);
+	    bool32 isDown = ((msg.lParam & (1 << 31)) == 0);
+	    //TODO: Change the properties here bc I don't think this will work for the setup you are trying to achieve with the precise inputs determining things like how long a button is pressed (although half transition count might be this)
+	    if (wasDown != isDown)
+	    {
+		if (VKCode == 'W')
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->moveUp, isDown);
+		}
+		else if (VKCode == 'A')
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->moveLeft, isDown);
+		}
+		else if (VKCode == 'S')
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->moveDown, isDown);
+		}
+		else if (VKCode == 'D')
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->moveRight, isDown);
+		}
+		else if (VKCode == 'Q')
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->rightShoulder, isDown);
+		}
+		else if (VKCode == VK_UP)
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->actionUp, isDown);
+		}
+		else if (VKCode == VK_DOWN)
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->actionDown, isDown);
+		}
+		else if (VKCode == VK_LEFT)
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->actionLeft, isDown);
+		}
+		else if (VKCode == VK_RIGHT)
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->actionRight, isDown);
+		}
+		else if (VKCode == VK_ESCAPE)
+		{
+		    running = false;
+		}
+		else if (VKCode == VK_SPACE)
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->start, isDown);
+		}
+#if JUMPER_INTERNAL
+		else if (VKCode == 'P')
+		{
+		    if (isDown)
+		    {
+			pause = !pause;
+		    }
+		}
+#endif
+		if (isDown)
+		{
+		    bool32 altKeyWasDown = ((msg.lParam & (1 << 29)) != 0);
+		    if ((VKCode == VK_F4) && altKeyWasDown)
+		    {
+			running = false;
+		    }
+		}
+	    }
+	} break;
+	default:
+	{
+	    TranslateMessage(&msg);
+	    DispatchMessage(&msg);
+	} break;
+	}
+    }
+}
+
 int CALLBACK WinMain(HINSTANCE hInstance,
 		     HINSTANCE hPrevInstance,
 		     LPSTR lpCmdLine,
 		     int nCmdShow)
 {
+    win32_audio_info audioInfo;
+    Win32InitSound(&audioInfo);
 
+    win32_state win32State = {};
     Win32LoadXInput();
     
     Win32ResizeDIBSection(&globalBackBuffer, 960, 540);
@@ -253,7 +420,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    0);
 	if (window)
 	{
-
+	    i32 xOffset = 0;
 	    game_input input[2] = {};
 	    game_input* newInput = &input[0];
 	    game_input* oldInput = &input[1];
@@ -261,15 +428,19 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    running = true;
 	    while (running)
 	    {
-		MSG msg;
-		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-		{
-		    DispatchMessage(&msg);
-		    TranslateMessage(&msg);		    
-		}
-
 		DWORD maxControllerCount = XUSER_MAX_COUNT;
 
+		//TODO: ProcessPendingMessages here
+		game_controller_input* oldKeyboardController = GetController(oldInput, 0);
+		game_controller_input* newKeyboardController = GetController(newInput, 0);
+		*newKeyboardController = {};
+		newKeyboardController->isConnected = true;
+		for (int buttonIndex = 0; buttonIndex < ArrayCount(newKeyboardController->buttons); ++buttonIndex)
+		{
+		    newKeyboardController->buttons[buttonIndex].endedDown =
+			oldKeyboardController->buttons[buttonIndex].endedDown;
+		}
+		Win32ProcessPendingMessages(&win32State, newKeyboardController);
 		
 		for (DWORD controllerIndex = 0; controllerIndex <  maxControllerCount; ++controllerIndex)
 		{
@@ -328,16 +499,46 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 							&newController->moveDown);
 			Win32ProcessXInputDigitalButton((newController->stickAverageY > threshold) ? 1 : 0,
 							&oldController->moveUp, 1,
-							&newController->moveUp);			
+							&newController->moveUp);
+
+			Win32ProcessXInputDigitalButton(pad->wButtons,
+							&oldController->actionDown, XINPUT_GAMEPAD_A,
+							&newController->actionDown);
+			Win32ProcessXInputDigitalButton(pad->wButtons,
+							&oldController->actionRight, XINPUT_GAMEPAD_B,
+							&newController->actionRight);
+			Win32ProcessXInputDigitalButton(pad->wButtons,
+							&oldController->actionLeft, XINPUT_GAMEPAD_X,
+							&newController->actionLeft);
+			Win32ProcessXInputDigitalButton(pad->wButtons,
+							&oldController->actionUp, XINPUT_GAMEPAD_Y,
+							&newController->actionUp);
+
+			Win32ProcessXInputDigitalButton(pad->wButtons,
+							&oldController->leftShoulder, XINPUT_GAMEPAD_LEFT_SHOULDER,
+							&newController->leftShoulder);
+			Win32ProcessXInputDigitalButton(pad->wButtons,
+							&oldController->rightShoulder, XINPUT_GAMEPAD_RIGHT_SHOULDER,
+							&newController->rightShoulder);
+			Win32ProcessXInputDigitalButton(pad->wButtons,
+							&oldController->back, XINPUT_GAMEPAD_BACK,
+							&newController->back);
+			Win32ProcessXInputDigitalButton(pad->wButtons,
+							&oldController->start, XINPUT_GAMEPAD_START,
+							&newController->start);
 			
+		    }
+		    else
+		    {
+			newController->isConnected = false;
 		    }
 		}
 
-		i32 xOffset = 0;
-		game_controller_input* cont = GetController(newInput, 1);
+
+		game_controller_input* cont = GetController(newInput, 0);
 		if (cont->moveUp.endedDown)
 		{
-		    xOffset += 10;
+		    xOffset += 1;
 		    OutputDebugString("controller up button pressed\n");
 		}
 		
