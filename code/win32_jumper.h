@@ -41,6 +41,7 @@ struct win32_audio_info
 {
     IXAudio2* audioInterface;
     IXAudio2MasteringVoice* audioMasterVoice;
+    IXAudio2SourceVoice* sourceVoice;
 };
 
 struct game_button_state

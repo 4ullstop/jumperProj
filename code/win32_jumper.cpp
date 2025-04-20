@@ -36,7 +36,7 @@ typedef X_AUDIO2_CREATE(x_audio2_create);
 typedef COINITIALIZE(co_initialize);
 
 internal void
-Win32InitSound(win32_audio_info* audioInfo)
+Win32InitSound(win32_audio_info* audioInfo, i32 samplesPerSecond)
 {
     HMODULE xAudioLibrary = LoadLibrary("XAudio2_9.dll");
 
@@ -48,7 +48,6 @@ Win32InitSound(win32_audio_info* audioInfo)
 	
 	if (xAudio2Create)
 	{
-	    
 	    if(xAudio2Create(&audioInfo->audioInterface, 0, XAUDIO2_DEFAULT_PROCESSOR) == S_OK)
 	    {
 		if (oleLibrary)
@@ -65,8 +64,25 @@ Win32InitSound(win32_audio_info* audioInfo)
 									    0) == S_OK)
 			{
 			    OutputDebugString("Audio Interface Mastering Voice created\n");
+			    //Populate WAVEFORMATEX structure
+			    WAVEFORMATEX wf = {};
+			    wf.wFormatTag = WAVE_FORMAT_PCM;
+			    wf.nChannels = 2;
+			    wf.nSamplesPerSec = samplesPerSecond;
+			    wf.wBitsPerSample = 16;
+			    wf.nBlockAlign = (wf.nChannels * wf.wBitsPerSample) / 8;
+			    wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
+			    wf.cbSize = 0;
+
+			    if (audioInfo->audioInterface->CreateSourceVoice(audioInfo->audioInterface->sourceVoice,
+									     &wf,
+									     0,
+									     XAUDIO2_MAX_FREQ_RATIO) == S_OK)
+			    {
+				//When you are ready to play a sound, you will submit a buffer to be read
+				//and then call the start audio function
+			    }
 			}
-			
 //			DWORD lastError = GetLastError();
 		    }
 		}
@@ -77,7 +93,6 @@ Win32InitSound(win32_audio_info* audioInfo)
 	    }
 	}
     }
-    
 }
 
 internal void
