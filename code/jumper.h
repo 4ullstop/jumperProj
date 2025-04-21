@@ -1,4 +1,103 @@
 #if !defined (JUMPER_H)
 
+#include <stdint.h>
 #include <math.h>
+
+#define local_persist static
+#define global_variable static
+#define internal static
+
+#define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
+#define pi32 3.14159265359f
+
+typedef int8_t i8;
+typedef int16_t i16;
+typedef int32_t i32;
+typedef int64_t i64;
+
+typedef i32 bool32;
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+
+typedef float r32;
+typedef double r64;
+
+#define BITS_PER_SAMPLE 16
+#define SAMPLES_PER_SEC 44100
+#define AUDIO_BUFFER_SIZE_CYCLES 10
+#define CYCLES_PER_SEC 220.0f
+
+
+#define SAMPLES_PER_CYCLE (u32)(SAMPLES_PER_SEC / CYCLES_PER_SEC)
+#define AUDIO_BUFFER_SIZE_SAMPLES  SAMPLES_PER_CYCLE * AUDIO_BUFFER_SIZE_CYCLES
+#define AUDIO_BUFFER_SIZE_BYTES AUDIO_BUFFER_SIZE_SAMPLES * BITS_PER_SAMPLE / 8
+
+
+struct game_button_state
+{
+    int halfTransitionCount;
+    bool32 endedDown;
+};
+
+struct game_controller_input
+{
+    bool32 isAnalog;
+    bool32 isConnected;
+
+    r32 stickAverageX;
+    r32 stickAverageY;
+
+    union
+    {
+	game_button_state buttons[12];
+	struct
+	{
+	    game_button_state moveUp;
+	    game_button_state moveDown;
+	    game_button_state moveRight;
+	    game_button_state moveLeft;
+
+	    game_button_state actionUp;
+	    game_button_state actionDown;
+	    game_button_state actionLeft;
+	    game_button_state actionRight;
+
+	    game_button_state leftShoulder;
+	    game_button_state rightShoulder;
+
+	    game_button_state back;
+	    game_button_state start;
+
+	    game_button_state terminator;
+	};
+    };
+};
+
+struct game_input
+{
+    game_button_state mouseButtons[5];
+    i32 mouseX, mouseY, mouseZ;
+
+    r32 dTime;
+    game_controller_input controllers[5];
+};
+
+struct game_sound_info
+{
+    bool32 bufferFilled;
+    u8 buffer[AUDIO_BUFFER_SIZE_BYTES];
+};
+
+#define GAME_UPDATE_AND_RENDER(name) void name(game_input* input)
+typedef GAME_UPDATE_AND_RENDER(game_update_and_render);
+
+#define GAME_GET_SOUND_DATA(name) void name(game_sound_info* soundInfo)
+typedef GAME_GET_SOUND_DATA(game_get_sound_data);
+
+#define JUMPER_H
+#endif
+
 

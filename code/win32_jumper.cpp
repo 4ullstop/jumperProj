@@ -1,27 +1,11 @@
+#include "jumper.h"
+
 #include <windows.h>
 #include <xinput.h>
 #include <xaudio2.h>
 
 #include "win32_jumper.h"
 #include <math.h>
-
-#define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
-
-
-#define pi32 3.14159265359f
-
-
-
-#define BITS_PER_SAMPLE 16
-#define SAMPLES_PER_SEC 44100
-#define AUDIO_BUFFER_SIZE_CYCLES 10
-#define CYCLES_PER_SEC 220.0f
-
-
-#define SAMPLES_PER_CYCLE (DWORD)(SAMPLES_PER_SEC / CYCLES_PER_SEC)
-#define AUDIO_BUFFER_SIZE_SAMPLES  SAMPLES_PER_CYCLE * AUDIO_BUFFER_SIZE_CYCLES
-#define AUDIO_BUFFER_SIZE_BYTES AUDIO_BUFFER_SIZE_SAMPLES * BITS_PER_SAMPLE / 8
-
 
 global_variable bool32 running;
 global_variable win32_offscreen_buffer globalBackBuffer;
@@ -51,57 +35,152 @@ typedef X_AUDIO2_CREATE(x_audio2_create);
 #define COINITIALIZE(name) HRESULT name(LPVOID pvReserved, DWORD dwCoInit)
 typedef COINITIALIZE(co_initialize);
 
+
+
+internal void
+CatStrings(size_t sourceACount, char* sourceA,
+	   size_t sourceBCount, char* sourceB,
+	   size_t destCount, char* dest)
+{
+    for (int index = 0; index < sourceACount; ++index)
+    {
+	*dest++ = *sourceA++;
+    }
+    for (int index = 0; index < sourceBCount; ++index)
+    {
+	*dest++ = *sourceB++;
+    }
+    *dest++ = 0;
+}
+
+internal void
+Win32GetEXEFilename(win32_state* state)
+{
+    DWORD sizeOfFilename = GetModuleFileName(0, state->exeFilename, sizeof(state->exeFilename));
+    state->onePastLastExeFilenameSlash = state->exeFilename;
+    for (char* scan = state->exeFilename; *scan; ++scan)
+    {
+	if (*scan == '\\')
+	{
+	    state->onePastLastExeFilenameSlash = scan + 1;
+	}
+    }
+}
+
+internal int
+StringLength(char* string)
+{
+    int count = 0;
+    while (*string++)
+    {
+	++count;
+    }
+    return(count);
+}
+
+internal void
+Win32BuildEXEPathFilename(win32_state* state, char* filename, int destCount, char* dest)
+{
+    CatStrings(state->onePastLastExeFilenameSlash - state->exeFilename, state->exeFilename,
+	      StringLength(filename), filename,
+	      destCount, dest);
+}
+
+inline FILETIME
+Win32GetLastWriteTime(char* filename)
+{
+    FILETIME lastWriteTime = {};
+
+    WIN32_FILE_ATTRIBUTE_DATA data;
+    if (GetFileAttributesEx(filename, GetFileExInfoStandard, &data))
+    {
+	lastWriteTime = data.ftLastWriteTime;
+    }
+    return(lastWriteTime);
+}
+
+internal win32_game_code
+Win32LoadGameCode(char* sourceDLLName, char* tempDLLName, char* lockFilename)
+{
+    win32_game_code result = {};
+    WIN32_FILE_ATTRIBUTE_DATA ignored;
+    if (!GetFileAttributesEx(lockFilename, GetFileExInfoStandard, &ignored))
+    {
+	result.dllLastWriteTime =Win32GetLastWriteTime(sourceDLLName);
+
+	CopyFile(sourceDLLName, tempDLLName, FALSE);
+	result.gameCodeDLL = LoadLibrary(tempDLLName);
+
+	if (result.gameCodeDLL)
+	{
+	    result.UpdateAndRender = (game_update_and_render*)GetProcAddress(result.gameCodeDLL, "GameUpdateAndRender");
+	    result.GetSoundData = (game_get_sound_data*)GetProcAddress(result.gameCodeDLL, "GameGetSoundData");
+	    result.isValid = (result.UpdateAndRender && result.GetSoundData);
+	}
+    }
+    if (!result.isValid)
+    {
+	result.UpdateAndRender = 0;
+    }
+    return(result);
+}
+
 internal void
 Win32InitSound(win32_audio_info* audioInfo, i32 samplesPerSecond)
 {
     HMODULE xAudioLibrary = LoadLibrary("XAudio2_9.dll");
-
     HMODULE oleLibrary = LoadLibrary("Ole32.dll");
-    if (xAudioLibrary)
+
+    if (xAudioLibrary && oleLibrary)
     {
 	x_audio2_create* xAudio2Create = (x_audio2_create*)GetProcAddress(xAudioLibrary, "XAudio2Create");
+	co_initialize* coinitialize = (co_initialize*)GetProcAddress(oleLibrary, "CoInitializeEx");	
 	
-	
-	if (xAudio2Create)
+	if (xAudio2Create && coinitialize)
 	{
 	    if(xAudio2Create(&audioInfo->audioInterface, 0, XAUDIO2_DEFAULT_PROCESSOR) == S_OK)
 	    {
-		if (oleLibrary)
+		if (coinitialize(0, COINIT_MULTITHREADED) == S_OK)
 		{
-		    co_initialize* coinitialize = (co_initialize*)GetProcAddress(oleLibrary, "CoInitializeEx");
-
-		    if (coinitialize(0, COINIT_MULTITHREADED) == S_OK)
+		    if (audioInfo->audioInterface->CreateMasteringVoice(&audioInfo->audioMasterVoice,
+									XAUDIO2_DEFAULT_CHANNELS,
+									XAUDIO2_DEFAULT_SAMPLERATE,
+									0,
+									0) == S_OK)
 		    {
-			
-			if (audioInfo->audioInterface->CreateMasteringVoice(&audioInfo->audioMasterVoice,
-									    XAUDIO2_DEFAULT_CHANNELS,
-									    XAUDIO2_DEFAULT_SAMPLERATE,
-									    0,
-									    0) == S_OK)
-			{
-			    OutputDebugString("Audio Interface Mastering Voice created\n");
-			    //Populate WAVEFORMATEX structure
-			    WAVEFORMATEX wf = {};
-			    wf.wFormatTag = WAVE_FORMAT_PCM;
-			    wf.nChannels = 1;
-			    wf.nSamplesPerSec = SAMPLES_PER_SEC;
-			    wf.wBitsPerSample = BITS_PER_SAMPLE;
-			    wf.nBlockAlign = wf.nChannels * BITS_PER_SAMPLE / 8;
-			    wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
-			    wf.cbSize = 0;
+			OutputDebugString("Audio Interface Mastering Voice created\n");
+			//Populate WAVEFORMATEX structure
+			WAVEFORMATEX wf = {};
+			wf.wFormatTag = WAVE_FORMAT_PCM;
+			wf.nChannels = 1;
+			wf.nSamplesPerSec = SAMPLES_PER_SEC;
+			wf.wBitsPerSample = BITS_PER_SAMPLE;
+			wf.nBlockAlign = wf.nChannels * BITS_PER_SAMPLE / 8;
+			wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
+			wf.cbSize = 0;
 
-			    if (audioInfo->audioInterface->CreateSourceVoice(&audioInfo->sourceVoice,
-									     &wf,
-									     0,
-									     XAUDIO2_MAX_FREQ_RATIO) == S_OK)
-			    {
-				//When you are ready to play a sound, you will submit a buffer to be read
-				//and then call the start audio function
-				OutputDebugString("SoundSource Successfully created\n");
-			    }
+			if (audioInfo->audioInterface->CreateSourceVoice(&audioInfo->sourceVoice,
+									 &wf,
+									 0,
+									 XAUDIO2_MAX_FREQ_RATIO) == S_OK)
+			{
+			    //When you are ready to play a sound, you will submit a buffer to be read
+			    //and then call the start audio function
+			    OutputDebugString("SoundSource Successfully created\n");
 			}
-//			DWORD lastError = GetLastError();
+			else
+			{
+
+			}
 		    }
+		    else
+		    {
+
+		    }
+		}
+		else
+		{
+
 		}
 	    }
 	    else
@@ -417,15 +496,44 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
     }
 }
 
+internal void
+Win32PlayAndSubmitSound(win32_audio_info* audioInfo, u8* audioBuffer)
+{
+
+    XAUDIO2_BUFFER audioDataBuffer = {};
+    audioDataBuffer.Flags = XAUDIO2_END_OF_STREAM;
+    audioDataBuffer.AudioBytes = AUDIO_BUFFER_SIZE_BYTES;
+    audioDataBuffer.pAudioData = (BYTE*)audioBuffer;
+    audioDataBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+	    
+    audioInfo->sourceVoice->SubmitSourceBuffer(&audioDataBuffer);
+    audioInfo->sourceVoice->Start(0);
+}
+
+
 int CALLBACK WinMain(HINSTANCE hInstance,
 		     HINSTANCE hPrevInstance,
 		     LPSTR lpCmdLine,
 		     int nCmdShow)
 {
+    win32_state win32State = {};
+    Win32GetEXEFilename(&win32State);
+    
+    char sourceGameCodeDLLFullPath[WIN32_STATE_FILE_NAME_COUNT];
+    Win32BuildEXEPathFilename(&win32State, "jumper.dll", sizeof(sourceGameCodeDLLFullPath), sourceGameCodeDLLFullPath);
+
+    char tempCodeDLLFullPath[WIN32_STATE_FILE_NAME_COUNT];
+    Win32BuildEXEPathFilename(&win32State, "jumper_temp.dll", sizeof(tempCodeDLLFullPath), tempCodeDLLFullPath);
+
+    char gameCodeLockFullPath[WIN32_STATE_FILE_NAME_COUNT];
+    Win32BuildEXEPathFilename(&win32State, "lock.tmp", sizeof(gameCodeLockFullPath), gameCodeLockFullPath);
+
+
+    
     win32_audio_info audioInfo;
     Win32InitSound(&audioInfo, 48000);
+    game_sound_info soundInfo = {};
 
-    win32_state win32State = {};
     Win32LoadXInput();
     
     Win32ResizeDIBSection(&globalBackBuffer, 960, 540);
@@ -458,33 +566,35 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    game_input* oldInput = &input[1];
 
 
-	    r64 phase{};
-	    u32 bufferIndex{};
-	    byte audioBuffer[AUDIO_BUFFER_SIZE_BYTES];
+#if 0
+	    //NOTE: This is the code for writing a sine wave, everthing is packed but will need
+	    //more attention when the time comes for abstracting the game layer and such
+
+	    r64 phase = 0;
+	    u32 bufferIndex = 0;
+	    u8 audioBuffer[AUDIO_BUFFER_SIZE_BYTES];
 	    //The action of filling the buffer
 	    while (bufferIndex < AUDIO_BUFFER_SIZE_BYTES)
 	    {
 		phase += (2 * pi32) / SAMPLES_PER_CYCLE;
 		i16 sample = (i16)(sin(phase) * INT16_MAX * 0.5f); //last value here is our volume, I'm just too lazy to make  variable atm
-		audioBuffer[bufferIndex++] = (byte)sample;
-		audioBuffer[bufferIndex++] = (byte)(sample >> 8);
+		audioBuffer[bufferIndex++] = (u8)sample;
+		audioBuffer[bufferIndex++] = (u8)(sample >> 8);
 	    }
-	    
-	    XAUDIO2_BUFFER audioDataBuffer = {};
-	    audioDataBuffer.Flags = XAUDIO2_END_OF_STREAM;
-	    audioDataBuffer.AudioBytes = AUDIO_BUFFER_SIZE_BYTES;
-	    audioDataBuffer.pAudioData = (BYTE*)&audioBuffer;
-	    audioDataBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;
-	    
-	    audioInfo.sourceVoice->SubmitSourceBuffer(&audioDataBuffer);
-	    audioInfo.sourceVoice->Start(0);
-	    
+
+	    Win32PlayAndSubmitSound(&audioInfo, audioBuffer);
+#endif	    
 	    running = true;
+
+
+	    char* sourceDLLName = "jumper.dll";
+	    win32_game_code game = Win32LoadGameCode(sourceGameCodeDLLFullPath, tempCodeDLLFullPath, gameCodeLockFullPath);
+	    
 	    while (running)
 	    {
 		DWORD maxControllerCount = XUSER_MAX_COUNT;
 
-		//TODO: ProcessPendingMessages here
+
 		game_controller_input* oldKeyboardController = GetController(oldInput, 0);
 		game_controller_input* newKeyboardController = GetController(newInput, 0);
 		*newKeyboardController = {};
@@ -588,7 +698,20 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		    }
 		}
 
+		if (game.UpdateAndRender)
+		{
+		    game.UpdateAndRender(newInput);
+		}
 
+		if (game.GetSoundData)
+		{
+		    if (!soundInfo.bufferFilled)
+		    {
+			game.GetSoundData(&soundInfo);
+			//TODO: After you get the sound data, fill the audio buffer and start playing the sound
+			Win32PlayAndSubmitSound(&audioInfo, soundInfo.buffer);
+		    }
+		}
 		game_controller_input* cont = GetController(newInput, 0);
 		if (cont->moveUp.endedDown)
 		{

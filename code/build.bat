@@ -7,6 +7,10 @@ set commonLinkerFlags= -incremental:no user32.lib gdi32.lib winmm.lib
 IF NOT EXIST ..\build mkdir ..\build
 pushd ..\build
 
+echo WAITING FOR PDB > lock.tmp
+cl %commonCompilerFlags% ..\code\jumper.cpp -Fmjumper.map /LD /link /EXPORT:GameUpdateAndRender /EXPORT:GameGetSoundData
+
+del lock.tmp
 cl %commonCompilerFlags% ..\code\win32_jumper.cpp -Fmwin32_jumper.map /link %commonLinkerFlags%
 popd
 
