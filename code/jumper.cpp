@@ -1,6 +1,24 @@
 #include "jumper.h"
 
 internal void
+RenderGradient(game_offscreen_buffer* buffer, int xOffset, int yOffset)
+{
+    u8* row = (u8*)buffer->memory;
+    for (int y = 0; y < buffer->height; ++y)
+    {
+	u32* pixel = (u32*)row;
+	for (int x = 0; x < buffer->width; ++x)
+	{
+	    u8 blue = (u8)(x + xOffset);
+	    u8 green = (u8)(y + yOffset);
+
+	    *pixel++ = ((green << 16) | blue);
+	}
+	row += buffer->pitch;
+    }
+}
+
+internal void
 FillSinWaveSoundBuffer(game_sound_info* gameSoundInfo)
 {
     r64 phase = 0;
@@ -56,4 +74,6 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    }
 	}
     }
+
+    RenderGradient(backBuffer, gameState->xOffset, gameState->yOffset);
 }

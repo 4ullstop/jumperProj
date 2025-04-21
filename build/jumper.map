@@ -1,6 +1,6 @@
  jumper
 
- Timestamp is 68069591 (Mon Apr 21 14:59:29 2025)
+ Timestamp is 6806a4db (Mon Apr 21 16:04:43 2025)
 
  Preferred load address is 0000000180000000
 
@@ -314,8 +314,8 @@
  0001:00010a40       ?getArrayType@UnDecorator@@CA?AVDName@@AEBV2@@Z 0000000180011a40 f i libvcruntimed:undname.obj
  0001:00010ef0       ?getBasedType@UnDecorator@@CA?AVDName@@XZ 0000000180011ef0 f   libvcruntimed:undname.obj
  0001:00011090       ?getBasicDataType@UnDecorator@@CA?AVDName@@AEBV2@@Z 0000000180012090 f   libvcruntimed:undname.obj
- 0001:00011f30       GameGetSoundData           0000000180012f30 f   jumper.obj
- 0001:00011f70       GameUpdateAndRender        0000000180012f70 f   jumper.obj
+ 0001:00012010       GameGetSoundData           0000000180013010 f   jumper.obj
+ 0001:00012050       GameUpdateAndRender        0000000180013050 f   jumper.obj
  0001:000121f0       ?getCHPEName@UnDecorator@@QEAAPEADPEADH@Z 00000001800131f0 f i libvcruntimed:undname.obj
  0001:00012430       ?getCallIndex@UnDecorator@@CA?AVDName@@XZ 0000000180013430 f i libvcruntimed:undname.obj
  0001:00012460       ?getCallingConvention@UnDecorator@@CA?AVDName@@XZ 0000000180013460 f   libvcruntimed:undname.obj
@@ -9155,7 +9155,8 @@
  0001:00011ddc       $LN82                      0000000180012ddc     libvcruntimed:undname.obj
  0001:00011e38       $LN81                      0000000180012e38     libvcruntimed:undname.obj
  0001:00011e54       $LN80                      0000000180012e54     libvcruntimed:undname.obj
- 0001:00011e80       ?FillSinWaveSoundBuffer@@YAXPEAUgame_sound_info@@@Z 0000000180012e80 f   jumper.obj
+ 0001:00011e80       ?RenderGradient@@YAXPEAUgame_offscreen_buffer@@HH@Z 0000000180012e80 f   jumper.obj
+ 0001:00011f60       ?FillSinWaveSoundBuffer@@YAXPEAUgame_sound_info@@@Z 0000000180012f60 f   jumper.obj
  0001:000127c0       $LN20                      00000001800137c0     libvcruntimed:undname.obj
  0001:00014970       $LN22                      0000000180015970     libvcruntimed:undname.obj
  0001:00014990       $LN21                      0000000180015990     libvcruntimed:undname.obj
@@ -13519,13 +13520,14 @@
  0002:0002f970       $xdatasym$memcmp           0000000180112970     libvcruntimed:memcmp.obj
  0002:0002f974       $unwind$strrchr            0000000180112974     libvcruntimed:strrchr.obj
  0002:0002f97c       $unwind$_local_unwind      000000018011297c     libvcruntimed:jmpuwind.obj
- 0002:0002f984       $unwind$?FillSinWaveSoundBuffer@@YAXPEAUgame_sound_info@@@Z 0000000180112984     jumper.obj
- 0002:0002f98c       $unwind$GameGetSoundData   000000018011298c     jumper.obj
- 0002:0002f994       $unwind$GameUpdateAndRender 0000000180112994     jumper.obj
  0002:0002f99c       $unwind$_sincos_special    000000018011299c     libucrtd:sincos_special.obj
  0002:0002f9ac       $unwind$_sincosf_special   00000001801129ac     libucrtd:sincos_special.obj
  0002:0002f9c0       $xdatasym                  00000001801129c0     libucrtd:remainder_piby2_forfma3.obj
  0002:0002f9d0       $xdatasym                  00000001801129d0     libucrtd:remainder_piby2_forasm.obj
+ 0002:0002f9dc       $unwind$?RenderGradient@@YAXPEAUgame_offscreen_buffer@@HH@Z 00000001801129dc     jumper.obj
+ 0002:0002f9e4       $unwind$?FillSinWaveSoundBuffer@@YAXPEAUgame_sound_info@@@Z 00000001801129e4     jumper.obj
+ 0002:0002f9ec       $unwind$GameGetSoundData   00000001801129ec     jumper.obj
+ 0002:0002f9f4       $unwind$GameUpdateAndRender 00000001801129f4     jumper.obj
  0002:00030600       .edata                     0000000180113600     jumper.exp
  0002:00030628       rgpv                       0000000180113628     jumper.exp
  0002:00030630       rgszName                   0000000180113630     jumper.exp

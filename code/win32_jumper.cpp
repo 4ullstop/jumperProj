@@ -240,24 +240,6 @@ Win32ProcessXInputDigitalButton(DWORD xInputButtonState, game_button_state* oldS
     newState->halfTransitionCount = (newState->endedDown != oldState->endedDown) ? 1 : 0;
 }
 
-internal void
-RenderGradient(win32_offscreen_buffer* buffer, int xOffset, int yOffset)
-{
-    u8* row = (u8*)buffer->memory;
-    for (int y = 0; y < buffer->height; ++y)
-    {
-	u32* pixel = (u32*)row;
-	for (int x = 0; x < buffer->width; ++x)
-	{
-	    u8 blue = (u8)(x + xOffset);
-	    u8 green = (u8)(y + yOffset);
-
-	    *pixel++ = ((green << 16) | blue);
-	}
-	row += buffer->pitch;
-    }
-}
-
 internal win32_window_dimension
 Win32GetWindowDimension(HWND window)
 {
@@ -698,9 +680,16 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		    }
 		}
 
+		game_offscreen_buffer goBuffer = {};
+		goBuffer.memory = globalBackBuffer.memory;
+		goBuffer.width = globalBackBuffer.width;
+		goBuffer.height = globalBackBuffer.height;
+		goBuffer.pitch = globalBackBuffer.pitch;
+		goBuffer.bytesPerPixel = globalBackBuffer.bytesPerPixel;
+		
 		if (game.UpdateAndRender)
 		{
-		    game.UpdateAndRender(&gameState, newInput);
+		    game.UpdateAndRender(&gameState, &goBuffer, newInput);
 		}
 
 		if (game.GetSoundData)
@@ -722,7 +711,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		
 		
 		win32_window_dimension dimension = Win32GetWindowDimension(window);
-		RenderGradient(&globalBackBuffer, gameState.xOffset, gameState.yOffset);
+
 		
 		HDC deviceContext = GetDC(window);
 		Win32DisplayBufferWindow(&globalBackBuffer, deviceContext, 0, 0, dimension.width, dimension.height);

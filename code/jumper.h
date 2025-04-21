@@ -35,6 +35,14 @@ typedef double r64;
 #define AUDIO_BUFFER_SIZE_SAMPLES  SAMPLES_PER_CYCLE * AUDIO_BUFFER_SIZE_CYCLES
 #define AUDIO_BUFFER_SIZE_BYTES AUDIO_BUFFER_SIZE_SAMPLES * BITS_PER_SAMPLE / 8
 
+struct game_offscreen_buffer
+{
+    void* memory;
+    i32 height;
+    i32 width;
+    i32 pitch;
+    i32 bytesPerPixel;
+};
 
 struct game_button_state
 {
@@ -103,7 +111,7 @@ inline game_controller_input* GetController(game_input* input, int unsigned cont
     return(result);
 }
 
-#define GAME_UPDATE_AND_RENDER(name) void name(game_state* gameState, game_input* input)
+#define GAME_UPDATE_AND_RENDER(name) void name(game_state* gameState, game_offscreen_buffer* backBuffer, game_input* input)
 typedef GAME_UPDATE_AND_RENDER(game_update_and_render);
 
 #define GAME_GET_SOUND_DATA(name) void name(game_sound_info* soundInfo)
