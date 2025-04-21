@@ -126,6 +126,19 @@ Win32LoadGameCode(char* sourceDLLName, char* tempDLLName, char* lockFilename)
 }
 
 internal void
+Win32UnloadGameCode(win32_game_code* gameCode)
+{
+    if (gameCode->gameCodeDLL)
+    {
+	FreeLibrary(gameCode->gameCodeDLL);
+	gameCode->gameCodeDLL = 0;
+    }
+    gameCode->isValid = false;
+    gameCode->UpdateAndRender = 0;
+    gameCode->GetSoundData = 0;
+}
+
+internal void
 Win32InitSound(win32_audio_info* audioInfo, i32 samplesPerSecond)
 {
     HMODULE xAudioLibrary = LoadLibrary("XAudio2_9.dll");
@@ -571,11 +584,19 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 
 	    char* sourceDLLName = "jumper.dll";
 	    win32_game_code game = Win32LoadGameCode(sourceGameCodeDLLFullPath, tempCodeDLLFullPath, gameCodeLockFullPath);
+	    u32 loadCounter = 120;
 	    
 	    while (running)
 	    {
+		FILETIME newDLLWriteTime = Win32GetLastWriteTime(sourceGameCodeDLLFullPath);
+		if (CompareFileTime(&newDLLWriteTime, &game.dllLastWriteTime) != 0)
+		{
+		    Win32UnloadGameCode(&game);
+		    game = Win32LoadGameCode(sourceGameCodeDLLFullPath, tempCodeDLLFullPath, gameCodeLockFullPath);
+		    loadCounter = 0;
+		}
+		
 		DWORD maxControllerCount = XUSER_MAX_COUNT;
-
 
 		game_controller_input* oldKeyboardController = GetController(oldInput, 0);
 		game_controller_input* newKeyboardController = GetController(newInput, 0);
@@ -707,11 +728,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		    xOffset += 1;
 		    OutputDebugString("controller up button pressed\n");
 		}
-
-		
 		
 		win32_window_dimension dimension = Win32GetWindowDimension(window);
-
 		
 		HDC deviceContext = GetDC(window);
 		Win32DisplayBufferWindow(&globalBackBuffer, deviceContext, 0, 0, dimension.width, dimension.height);
