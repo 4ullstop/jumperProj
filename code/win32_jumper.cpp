@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <xinput.h>
 #include <xaudio2.h>
+#include <stdio.h>
 
 #include "win32_jumper.h"
 
@@ -10,6 +11,8 @@
 global_variable bool32 running;
 global_variable win32_offscreen_buffer globalBackBuffer;
 global_variable bool32 pause;
+global_variable i64 perfCountFrequency;
+
 
 #define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex, XINPUT_STATE* pState)
 typedef X_INPUT_GET_STATE(x_input_get_state);
@@ -505,12 +508,37 @@ Win32PlayAndSubmitSound(win32_audio_info* audioInfo, u8* audioBuffer)
     audioInfo->sourceVoice->Start(0);
 }
 
+inline LARGE_INTEGER
+Win32GetWallClock(void)
+{
+    LARGE_INTEGER result;
+    QueryPerformanceCounter(&result);
+    return(result);
+}
 
+inline r32
+Win32GetSecondsElapsed(LARGE_INTEGER start, LARGE_INTEGER end)
+{
+    r32 result = ((r32)(end.QuadPart - start.QuadPart) / (r32)perfCountFrequency);
+    return(result);
+}
+
+
+
+/*
+  WINMAIN
+  WINMAIN
+  WINMAIN
+ */
 int CALLBACK WinMain(HINSTANCE hInstance,
 		     HINSTANCE hPrevInstance,
 		     LPSTR lpCmdLine,
 		     int nCmdShow)
 {
+    LARGE_INTEGER perfCountFrequencyResult;
+    QueryPerformanceFrequency(&perfCountFrequencyResult);
+    perfCountFrequency = perfCountFrequencyResult.QuadPart;
+
     win32_state win32State = {};
     Win32GetEXEFilename(&win32State);
     
@@ -523,7 +551,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
     char gameCodeLockFullPath[WIN32_STATE_FILE_NAME_COUNT];
     Win32BuildEXEPathFilename(&win32State, "lock.tmp", sizeof(gameCodeLockFullPath), gameCodeLockFullPath);
 
-
+    UINT desiredSchedulerMs = 1;
+    bool32 sleepIsGranular = (timeBeginPeriod(desiredSchedulerMs) == TIMERR_NOERROR);
     
     win32_audio_info audioInfo;
     Win32InitSound(&audioInfo, 48000);
@@ -555,6 +584,20 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    0);
 	if (window)
 	{
+	    i32 monitorRefreshHz = 60;
+
+#if 1 
+	    HDC refreshDC = GetDC(window);
+	    i32 win32RefreshRate = GetDeviceCaps(refreshDC, VREFRESH);
+	    ReleaseDC(window, refreshDC);
+	    if (win32RefreshRate > 1)
+	    {
+		monitorRefreshHz = win32RefreshRate;
+	    }
+#endif
+	    r32 gameUpdateHz = (monitorRefreshHz / 2.0f);
+	    r32 targetSecondsPerFrame = 1.0f / (r32)gameUpdateHz;
+
 	    i32 xOffset = 0;
 	    game_input input[2] = {};
 	    game_input* newInput = &input[0];
@@ -585,6 +628,11 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    char* sourceDLLName = "jumper.dll";
 	    win32_game_code game = Win32LoadGameCode(sourceGameCodeDLLFullPath, tempCodeDLLFullPath, gameCodeLockFullPath);
 	    u32 loadCounter = 120;
+
+	    LARGE_INTEGER lastCounter = Win32GetWallClock();
+	    u64 lastCycleCount = __rdtsc();
+	    LARGE_INTEGER flipWallClock = Win32GetWallClock();
+
 	    
 	    while (running)
 	    {
@@ -722,12 +770,37 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			Win32PlayAndSubmitSound(&audioInfo, soundInfo.buffer);
 		    }
 		}
-		game_controller_input* cont = GetController(newInput, 0);
-		if (cont->moveUp.endedDown)
+
+		LARGE_INTEGER workCounter = Win32GetWallClock();
+		r32 workSecondsElapsed = Win32GetSecondsElapsed(lastCounter, workCounter);
+
+		r32 secondsElapsedForFrame = workSecondsElapsed;
+		if (secondsElapsedForFrame < targetSecondsPerFrame)
 		{
-		    xOffset += 1;
-		    OutputDebugString("controller up button pressed\n");
+		    DWORD sleepMs = 0;
+
+		    while (secondsElapsedForFrame < targetSecondsPerFrame)
+		    {
+			if (sleepIsGranular)
+			{
+			    sleepMs = (DWORD)(1000.0f * (targetSecondsPerFrame - secondsElapsedForFrame));
+			    if (sleepMs > 0)
+			    {
+				Sleep(sleepMs - 1);
+			    }
+			}
+			r32 testSecondsElapsedForFrame = Win32GetSecondsElapsed(lastCounter, Win32GetWallClock());
+			secondsElapsedForFrame = Win32GetSecondsElapsed(lastCounter, Win32GetWallClock());
+			if (testSecondsElapsedForFrame < targetSecondsPerFrame)
+			{
+			    
+			}
+		    }
 		}
+
+		LARGE_INTEGER endCounter = Win32GetWallClock();
+		r32 msPerFrame = (1000.0f * (Win32GetSecondsElapsed(lastCounter, endCounter)));
+		lastCounter = endCounter;
 		
 		win32_window_dimension dimension = Win32GetWindowDimension(window);
 		
@@ -735,6 +808,21 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		Win32DisplayBufferWindow(&globalBackBuffer, deviceContext, 0, 0, dimension.width, dimension.height);
 		ReleaseDC(window, deviceContext);
 
+		flipWallClock = Win32GetWallClock();
+
+		u64 endCycleCount = __rdtsc();
+		u64 cyclesElapsed = endCycleCount - lastCycleCount;
+
+		r64 FPS = 0;
+		r64 MCPF = (r64)(cyclesElapsed / (1000 * 1000));
+
+#if 1
+		char fpsBuffer[250];
+		sprintf_s(fpsBuffer, "%.02fms/f, %ff/s, %.02fmc/f\n", msPerFrame, FPS, MCPF);
+		OutputDebugString(fpsBuffer);
+#endif
+		lastCycleCount = endCycleCount;
+		
 		game_input* temp = newInput;
 		newInput = oldInput;
 		oldInput = temp;
