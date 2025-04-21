@@ -28,5 +28,32 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 {
     int foo = 4;
 
-    
+    for (int controllerIndex = 0; controllerIndex < ArrayCount(input->controllers); ++controllerIndex)
+    {
+	game_controller_input* controller = GetController(input, controllerIndex);
+
+	if (controller->isAnalog)
+	{
+
+	}
+	else
+	{
+	    if (controller->moveUp.endedDown)
+	    {
+		gameState->yOffset++;
+	    }
+	    if (controller->moveDown.endedDown)
+	    {
+		gameState->yOffset--;
+	    }
+	    if (controller->moveLeft.endedDown)
+	    {
+		gameState->xOffset++;
+	    }
+	    if (controller->moveRight.endedDown)
+	    {
+		gameState->xOffset--;
+	    }
+	}
+    }
 }

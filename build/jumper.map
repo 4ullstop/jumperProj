@@ -1,6 +1,6 @@
  jumper
 
- Timestamp is 6806937b (Mon Apr 21 14:50:35 2025)
+ Timestamp is 68069591 (Mon Apr 21 14:59:29 2025)
 
  Preferred load address is 0000000180000000
 
@@ -116,6 +116,7 @@
  0001:000074c0       __crt_debugger_hook        00000001800084c0 f   LIBCMTD:utility_desktop.obj
  0001:000074e0       __scrt_fastfail            00000001800084e0 f   LIBCMTD:utility_desktop.obj
  0001:00007680       _tanf_special              0000000180008680 f   libucrtd:sincos_special.obj
+ 0001:000076b0       ?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 00000001800086b0 f i jumper.obj
  0001:000076e0       __scrt_get_show_window_mode 00000001800086e0 f   LIBCMTD:utility_desktop.obj
  0001:00007750       __scrt_initialize_mta      0000000180008750 f   LIBCMTD:utility_desktop.obj
  0001:00007770       __scrt_initialize_winrt    0000000180008770 f   LIBCMTD:utility_desktop.obj
@@ -170,8 +171,6 @@
  0001:00008b52       GetCurrentProcess          0000000180009b52 f   kernel32:KERNEL32.dll
  0001:00008b58       TerminateProcess           0000000180009b58 f   kernel32:KERNEL32.dll
  0001:00008b60       __C_specific_handler       0000000180009b60 f   libvcruntimed:riscchandler.obj
- 0001:00009080       GameGetSoundData           000000018000a080 f   jumper.obj
- 0001:000090c0       GameUpdateAndRender        000000018000a0c0 f   jumper.obj
  0001:00009150       ??$?RD@__crt_internal_free_policy@@QEBAXQEBD@Z 000000018000a150 f i libvcruntimed:std_type_info.obj
  0001:00009180       ??$?RX@__crt_internal_free_policy@@QEBAXQEBX@Z 000000018000a180 f i libvcruntimed:std_type_info.obj
  0001:000091b0       ??$__crt_interlocked_compare_exchange_pointer@$$CBDPEAD$$T@@YAPEBDPEDSEBDQEAD$$T@Z 000000018000a1b0 f i libvcruntimed:std_type_info.obj
@@ -315,6 +314,8 @@
  0001:00010a40       ?getArrayType@UnDecorator@@CA?AVDName@@AEBV2@@Z 0000000180011a40 f i libvcruntimed:undname.obj
  0001:00010ef0       ?getBasedType@UnDecorator@@CA?AVDName@@XZ 0000000180011ef0 f   libvcruntimed:undname.obj
  0001:00011090       ?getBasicDataType@UnDecorator@@CA?AVDName@@AEBV2@@Z 0000000180012090 f   libvcruntimed:undname.obj
+ 0001:00011f30       GameGetSoundData           0000000180012f30 f   jumper.obj
+ 0001:00011f70       GameUpdateAndRender        0000000180012f70 f   jumper.obj
  0001:000121f0       ?getCHPEName@UnDecorator@@QEAAPEADPEADH@Z 00000001800131f0 f i libvcruntimed:undname.obj
  0001:00012430       ?getCallIndex@UnDecorator@@CA?AVDName@@XZ 0000000180013430 f i libvcruntimed:undname.obj
  0001:00012460       ?getCallingConvention@UnDecorator@@CA?AVDName@@XZ 0000000180013460 f   libvcruntimed:undname.obj
@@ -9129,7 +9130,6 @@
  0001:00008570       $$000000                   0000000180009570     LIBCMTD:amdsecgs.obj
  0001:00008960       capture_current_context    0000000180009960 f   LIBCMTD:gs_report.obj
  0001:00008a20       capture_previous_context   0000000180009a20 f   LIBCMTD:gs_report.obj
- 0001:00008fd0       ?FillSinWaveSoundBuffer@@YAXPEAUgame_sound_info@@@Z 0000000180009fd0 f   jumper.obj
  0001:000090f0       ?<lambda_invoker_cdecl>@<lambda_1>@?1??__std_type_info_name@@YAPEBDPEAU__std_type_info_data@@PEAU__type_info_node@@@Z@SA@_K@Z 000000018000a0f0 f   libvcruntimed:std_type_info.obj
  0001:00009120       ?<lambda_invoker_cdecl>@<lambda_2>@?1??__std_type_info_name@@YAPEBDPEAU__std_type_info_data@@PEAU__type_info_node@@@Z@SA@QEAX@Z 000000018000a120 f   libvcruntimed:std_type_info.obj
  0001:00009300       ??R<lambda_1>@?1??__std_type_info_name@@YAPEBDPEAU__std_type_info_data@@PEAU__type_info_node@@@Z@QEBA@_K@Z 000000018000a300 f   libvcruntimed:std_type_info.obj
@@ -9155,6 +9155,7 @@
  0001:00011ddc       $LN82                      0000000180012ddc     libvcruntimed:undname.obj
  0001:00011e38       $LN81                      0000000180012e38     libvcruntimed:undname.obj
  0001:00011e54       $LN80                      0000000180012e54     libvcruntimed:undname.obj
+ 0001:00011e80       ?FillSinWaveSoundBuffer@@YAXPEAUgame_sound_info@@@Z 0000000180012e80 f   jumper.obj
  0001:000127c0       $LN20                      00000001800137c0     libvcruntimed:undname.obj
  0001:00014970       $LN22                      0000000180015970     libvcruntimed:undname.obj
  0001:00014990       $LN21                      0000000180015990     libvcruntimed:undname.obj
@@ -11292,6 +11293,7 @@
  0002:0002a280       $unwind$??$__crt_fast_encode_pointer@P6AHXZ@@YAP6AHXZQ6AHXZ@Z 000000018010d280     libucrtd:onexit.obj
  0002:0002a288       $unwind$??$__crt_fast_encode_pointer@PEAP6AXXZ@@YAPEAP6AXXZQEAP6AXXZ@Z 000000018010d288     libucrtd:onexit.obj
  0002:0002a290       $unwind$??$__acrt_lock_and_call@V<lambda_208ce30acdd7200aa596f2796f4d5154>@@@@YAHW4__acrt_lock_id@@$$QEAV<lambda_208ce30acdd7200aa596f2796f4d5154>@@@Z 000000018010d290     libucrtd:onexit.obj
+ 0002:0002a2a0       $unwind$?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 000000018010d2a0     jumper.obj
  0002:0002a2a8       $ip2state$??$__acrt_lock_and_call@V<lambda_208ce30acdd7200aa596f2796f4d5154>@@@@YAHW4__acrt_lock_id@@$$QEAV<lambda_208ce30acdd7200aa596f2796f4d5154>@@@Z 000000018010d2a8     libucrtd:onexit.obj
  0002:0002a2b0       $unwind$??R<lambda_d121dba8a4adeaf3a9819e48611155df>@@QEBA@XZ 000000018010d2b0     libucrtd:onexit.obj
  0002:0002a2c4       $stateUnwindMap$??R<lambda_d121dba8a4adeaf3a9819e48611155df>@@QEBA@XZ 000000018010d2c4     libucrtd:onexit.obj

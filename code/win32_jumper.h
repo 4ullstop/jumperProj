@@ -50,11 +50,6 @@ struct win32_state
     char* onePastLastExeFilenameSlash;
 };
 
-inline game_controller_input* GetController(game_input* input, int unsigned controllerIndex)
-{
-    game_controller_input* result = &input->controllers[controllerIndex];
-    return(result);
-}
 
 #define WIN32_JUMPER_H
 #endif

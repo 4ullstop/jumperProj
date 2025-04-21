@@ -91,7 +91,19 @@ struct game_sound_info
     u8 buffer[AUDIO_BUFFER_SIZE_BYTES];
 };
 
-#define GAME_UPDATE_AND_RENDER(name) void name(game_input* input)
+struct game_state
+{
+    i32 xOffset;
+    i32 yOffset;
+};
+
+inline game_controller_input* GetController(game_input* input, int unsigned controllerIndex)
+{
+    game_controller_input* result = &input->controllers[controllerIndex];
+    return(result);
+}
+
+#define GAME_UPDATE_AND_RENDER(name) void name(game_state* gameState, game_input* input)
 typedef GAME_UPDATE_AND_RENDER(game_update_and_render);
 
 #define GAME_GET_SOUND_DATA(name) void name(game_sound_info* soundInfo)

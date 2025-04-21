@@ -5,7 +5,7 @@
 #include <xaudio2.h>
 
 #include "win32_jumper.h"
-#include <math.h>
+
 
 global_variable bool32 running;
 global_variable win32_offscreen_buffer globalBackBuffer;
@@ -565,7 +565,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    game_input* newInput = &input[0];
 	    game_input* oldInput = &input[1];
 
-
+	    game_state gameState = {};
 #if 0
 	    //NOTE: This is the code for writing a sine wave, everthing is packed but will need
 	    //more attention when the time comes for abstracting the game layer and such
@@ -700,7 +700,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 
 		if (game.UpdateAndRender)
 		{
-		    game.UpdateAndRender(newInput);
+		    game.UpdateAndRender(&gameState, newInput);
 		}
 
 		if (game.GetSoundData)
@@ -718,9 +718,11 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		    xOffset += 1;
 		    OutputDebugString("controller up button pressed\n");
 		}
+
+		
 		
 		win32_window_dimension dimension = Win32GetWindowDimension(window);
-		RenderGradient(&globalBackBuffer, xOffset, 0);
+		RenderGradient(&globalBackBuffer, gameState.xOffset, gameState.yOffset);
 		
 		HDC deviceContext = GetDC(window);
 		Win32DisplayBufferWindow(&globalBackBuffer, deviceContext, 0, 0, dimension.width, dimension.height);
