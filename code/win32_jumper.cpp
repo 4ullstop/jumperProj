@@ -3,9 +3,25 @@
 #include <xaudio2.h>
 
 #include "win32_jumper.h"
-
+#include <math.h>
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
+
+
+#define pi32 3.14159265359f
+
+
+
+#define BITS_PER_SAMPLE 16
+#define SAMPLES_PER_SEC 44100
+#define AUDIO_BUFFER_SIZE_CYCLES 10
+#define CYCLES_PER_SEC 220.0f
+
+
+#define SAMPLES_PER_CYCLE (DWORD)(SAMPLES_PER_SEC / CYCLES_PER_SEC)
+#define AUDIO_BUFFER_SIZE_SAMPLES  SAMPLES_PER_CYCLE * AUDIO_BUFFER_SIZE_CYCLES
+#define AUDIO_BUFFER_SIZE_BYTES AUDIO_BUFFER_SIZE_SAMPLES * BITS_PER_SAMPLE / 8
+
 
 global_variable bool32 running;
 global_variable win32_offscreen_buffer globalBackBuffer;
@@ -67,20 +83,21 @@ Win32InitSound(win32_audio_info* audioInfo, i32 samplesPerSecond)
 			    //Populate WAVEFORMATEX structure
 			    WAVEFORMATEX wf = {};
 			    wf.wFormatTag = WAVE_FORMAT_PCM;
-			    wf.nChannels = 2;
-			    wf.nSamplesPerSec = samplesPerSecond;
-			    wf.wBitsPerSample = 16;
-			    wf.nBlockAlign = (wf.nChannels * wf.wBitsPerSample) / 8;
+			    wf.nChannels = 1;
+			    wf.nSamplesPerSec = SAMPLES_PER_SEC;
+			    wf.wBitsPerSample = BITS_PER_SAMPLE;
+			    wf.nBlockAlign = wf.nChannels * BITS_PER_SAMPLE / 8;
 			    wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
 			    wf.cbSize = 0;
 
-			    if (audioInfo->audioInterface->CreateSourceVoice(audioInfo->audioInterface->sourceVoice,
+			    if (audioInfo->audioInterface->CreateSourceVoice(&audioInfo->sourceVoice,
 									     &wf,
 									     0,
 									     XAUDIO2_MAX_FREQ_RATIO) == S_OK)
 			    {
 				//When you are ready to play a sound, you will submit a buffer to be read
 				//and then call the start audio function
+				OutputDebugString("SoundSource Successfully created\n");
 			    }
 			}
 //			DWORD lastError = GetLastError();
@@ -406,7 +423,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		     int nCmdShow)
 {
     win32_audio_info audioInfo;
-    Win32InitSound(&audioInfo);
+    Win32InitSound(&audioInfo, 48000);
 
     win32_state win32State = {};
     Win32LoadXInput();
@@ -439,6 +456,28 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    game_input input[2] = {};
 	    game_input* newInput = &input[0];
 	    game_input* oldInput = &input[1];
+
+
+	    r64 phase{};
+	    u32 bufferIndex{};
+	    byte audioBuffer[AUDIO_BUFFER_SIZE_BYTES];
+	    //The action of filling the buffer
+	    while (bufferIndex < AUDIO_BUFFER_SIZE_BYTES)
+	    {
+		phase += (2 * pi32) / SAMPLES_PER_CYCLE;
+		i16 sample = (i16)(sin(phase) * INT16_MAX * 0.5f); //last value here is our volume, I'm just too lazy to make  variable atm
+		audioBuffer[bufferIndex++] = (byte)sample;
+		audioBuffer[bufferIndex++] = (byte)(sample >> 8);
+	    }
+	    
+	    XAUDIO2_BUFFER audioDataBuffer = {};
+	    audioDataBuffer.Flags = XAUDIO2_END_OF_STREAM;
+	    audioDataBuffer.AudioBytes = AUDIO_BUFFER_SIZE_BYTES;
+	    audioDataBuffer.pAudioData = (BYTE*)&audioBuffer;
+	    audioDataBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+	    
+	    audioInfo.sourceVoice->SubmitSourceBuffer(&audioDataBuffer);
+	    audioInfo.sourceVoice->Start(0);
 	    
 	    running = true;
 	    while (running)
