@@ -10,6 +10,11 @@
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
 #define pi32 3.14159265359f
 
+#define Kilobytes(value) ((value) * 1024LL)
+#define Megabytes(value) (Kilobytes(value) * 1024LL)
+#define Gigabytes(value) (Megabytes(value) * 1024LL)
+#define Terabytes(value) (Gigabytes(value) * 1024LL)
+
 typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
@@ -93,6 +98,17 @@ struct game_input
     game_controller_input controllers[5];
 };
 
+struct game_memory
+{
+    bool32 isInitialized;
+
+    u64 permanentStorageSize;
+    void* permanentStorage;
+
+    u64 transientStorageSize;
+    void* transientStorage;
+};
+
 struct game_sound_info
 {
     bool32 bufferFilled;
@@ -111,7 +127,7 @@ inline game_controller_input* GetController(game_input* input, int unsigned cont
     return(result);
 }
 
-#define GAME_UPDATE_AND_RENDER(name) void name(game_state* gameState, game_offscreen_buffer* backBuffer, game_input* input)
+#define GAME_UPDATE_AND_RENDER(name) void name(game_state* gameState, game_offscreen_buffer* backBuffer, game_memory* memory, game_input* input)
 typedef GAME_UPDATE_AND_RENDER(game_update_and_render);
 
 #define GAME_GET_SOUND_DATA(name) void name(game_sound_info* soundInfo)
