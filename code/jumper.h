@@ -1,7 +1,8 @@
 #if !defined (JUMPER_H)
 
 #include <stdint.h>
-#include <math.h>
+
+
 
 #define local_persist static
 #define global_variable static
@@ -9,6 +10,12 @@
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
 #define pi32 3.14159265359f
+
+#if JUMPER_SLOW
+#define Assert(expression) if (!(expression)) *(int*)0 = 0;
+#else
+#define Assert(expression)
+#endif
 
 #define Kilobytes(value) ((value) * 1024LL)
 #define Megabytes(value) (Kilobytes(value) * 1024LL)
@@ -39,6 +46,8 @@ typedef double r64;
 #define SAMPLES_PER_CYCLE (u32)(SAMPLES_PER_SEC / CYCLES_PER_SEC)
 #define AUDIO_BUFFER_SIZE_SAMPLES  SAMPLES_PER_CYCLE * AUDIO_BUFFER_SIZE_CYCLES
 #define AUDIO_BUFFER_SIZE_BYTES AUDIO_BUFFER_SIZE_SAMPLES * BITS_PER_SAMPLE / 8
+
+#include "jumper_intrinsics.h"
 
 struct game_offscreen_buffer
 {
@@ -119,6 +128,9 @@ struct game_state
 {
     i32 xOffset;
     i32 yOffset;
+
+    r32 playerX;
+    r32 playerY;
 };
 
 inline game_controller_input* GetController(game_input* input, int unsigned controllerIndex)
@@ -127,7 +139,7 @@ inline game_controller_input* GetController(game_input* input, int unsigned cont
     return(result);
 }
 
-#define GAME_UPDATE_AND_RENDER(name) void name(game_state* gameState, game_offscreen_buffer* backBuffer, game_memory* memory, game_input* input)
+#define GAME_UPDATE_AND_RENDER(name) void name(game_state* gameState, game_offscreen_buffer* buffer, game_memory* memory, game_input* input)
 typedef GAME_UPDATE_AND_RENDER(game_update_and_render);
 
 #define GAME_GET_SOUND_DATA(name) void name(game_sound_info* soundInfo)
