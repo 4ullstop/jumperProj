@@ -66,7 +66,14 @@ FillSinWaveSoundBuffer(game_sound_info* gameSoundInfo)
     }
 }
 
-
+internal u32
+AddEntity(game_state* gameState)
+{
+    u32 entityIndex = gameState->entityCount++;
+    Assert(gameState->entityCount < ArrayCount(gameState->entities));
+    entity* result = &gameState->entities[entityIndex];
+    return(entityIndex);
+}
 
 extern "C" GAME_GET_SOUND_DATA(GameGetSoundData)
 {
@@ -88,6 +95,9 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     if (!memory->isInitialized)
     {
 
+	gameState->cameraP.absTileX = 17/2;
+	gameState->cameraP.absTileY = 9/2;
+	
 	InitializeArena(&gameState->worldArena, memory->permanentStorageSize - sizeof(game_state),
 			(u8*)memory->permanentStorage + sizeof(game_state));
 

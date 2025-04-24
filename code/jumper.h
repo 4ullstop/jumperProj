@@ -173,6 +173,14 @@ struct world
     tile_map* tileMap;
 };
 
+struct entity
+{
+    bool32 exists;
+    tile_map_position p;
+    u32 facingDirection;
+    v2 dP;
+    r32 width, height;
+};
 
 struct game_state
 {
@@ -187,6 +195,10 @@ struct game_state
 
     memory_arena worldArena;
     world* world;
+
+    u32 playerIndexForController[ArrayCount(((game_input*)0)->controllers)];
+    u32 entityCount;
+    entity entities[256];
 };
 
 
