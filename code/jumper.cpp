@@ -1,15 +1,14 @@
 #include "jumper.h"
+#include "jumper_tile.cpp"
 
 internal void
-DrawRectangle(game_offscreen_buffer* buffer,
-	      r32 realMinX, r32 realMinY,
-	      r32 realMaxX, r32 realMaxY,
+DrawRectangle(game_offscreen_buffer* buffer, v2 vMin, v2 vMax,
 	      r32 r, r32 g, r32 b)
 {
-    i32 minX = RoundReal32ToInt32(realMinX);
-    i32 minY = RoundReal32ToInt32(realMinY);
-    i32 maxX = RoundReal32ToInt32(realMaxX);
-    i32 maxY = RoundReal32ToInt32(realMaxY);
+    i32 minX = RoundReal32ToInt32(vMin.x);
+    i32 minY = RoundReal32ToInt32(vMin.y);
+    i32 maxX = RoundReal32ToInt32(vMax.x);
+    i32 maxY = RoundReal32ToInt32(vMax.y);
 
     if (minX < 0) minX = 0;
     if (minY < 0) minY = 0;
@@ -68,6 +67,7 @@ FillSinWaveSoundBuffer(game_sound_info* gameSoundInfo)
 }
 
 
+
 extern "C" GAME_GET_SOUND_DATA(GameGetSoundData)
 {
     if (!soundInfo->bufferFilled)
@@ -83,12 +83,76 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	   (ArrayCount(input->controllers[0].buttons)));
     Assert(sizeof(game_state) <= memory->permanentStorageSize);
 
-//    game_state* gameState = (game_state*)memory->permanentStorage;
+    game_state* gameState = (game_state*)memory->permanentStorage;
 
     if (!memory->isInitialized)
     {
+
+	InitializeArena(&gameState->worldArena, memory->permanentStorageSize - sizeof(game_state),
+			(u8*)memory->permanentStorage + sizeof(game_state));
+
+	gameState->world = PushStruct(&gameState->worldArena, world);
+	world* world = gameState->world;
+	world->tileMap = PushStruct(&gameState->worldArena, tile_map);
+
+	tile_map* tileMap = world->tileMap;
+
+	tileMap->chunkShift = 4;
+	tileMap->chunkMask = (1 << tileMap->chunkShift) - 1;
+	tileMap->chunkDim = (1 << tileMap->chunkShift);
+
+	tileMap->tileChunkCountX = 128;
+	tileMap->tileChunkCountY = 128;
+	tileMap->tileChunkCountZ = 2;
+
+	tileMap->tileChunks = PushArray(&gameState->worldArena,
+					tileMap->tileChunkCountX * tileMap->tileChunkCountY *
+					tileMap->tileChunkCountZ,
+					tile_chunk);
+
+	tileMap->tileSideInMeters = 1.4f;
+	
+
+	// the number of tiles per chunk
+	u32 tilesPerWidth = 17;
+	u32 tilesPerHeight = 9;
+
+	u32 screenX = 0;
+	u32 screenY = 0;
+	u32 absTileZ = 0;
+
+//initializing our tilemap
+	//TODO: Make this all read from a map file you create
+	for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
+	{
+	    for (u32 tileY = 0; tileY < tilesPerHeight; ++tileY)
+	    {
+		for (u32 tileX = 0; tileX < tilesPerWidth; ++tileX)
+		{
+		    u32 tileValue = 1;
+		    u32 absTileX = screenX * tilesPerWidth + tileX;
+		    u32 absTileY = screenY * tilesPerHeight + tileY;
+
+		    //TODO: SetTileValue here
+		    SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, tileValue);
+		    
+		}
+	    }
+	    //set it so we only have chunks going up atm, just to test things out
+	    screenY++;
+	}
+
 	memory->isInitialized = true;
     }
+
+
+    world* world = gameState->world;
+    tile_map* tileMap = world->tileMap;
+
+    i32 tileSideInPixels = 60;
+    r32 metersToPixels = tileSideInPixels / tileMap->tileSideInMeters;
+
+    
     
     for (int controllerIndex = 0; controllerIndex < ArrayCount(input->controllers); ++controllerIndex)
     {
@@ -128,28 +192,18 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	}
     }
 
-    u32 tileMap[9][17] =
-    {
-	{0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 1},
-	{0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 1},
-	{0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 1},
-	{0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 1},
-	{0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 1},
-	{0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 1},
-	{0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 1},
-	{0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 1},
-	{0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0, 1},	
-    };
-
     r32 upperLeftX = -30;
     r32 upperLeftY = 0;
     r32 tileWidth = 60;
     r32 tileHeight = 60;
 
+    
+
     //clear the background
-    DrawRectangle(buffer, 0.0f, 0.0f, (r32)buffer->width, (r32)buffer->height, 1.0f, 0.0f, 1.0f);
+//    DrawRectangle(buffer, 0.0f, 0.0f, (r32)buffer->width, (r32)buffer->height, 1.0f, 0.0f, 1.0f);
 
     //draw our tilemap
+#if 0    
     for (int row = 0; row < 9; ++row)
     {
 	for (int column = 0; column < 17; ++column)
@@ -169,7 +223,53 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    DrawRectangle(buffer, minX, minY, maxX, maxY, gray, gray, gray);
 	}
     }
+#endif
 
+    r32 screenCenterX = 0.5f *(r32)buffer->width;
+    r32 screenCenterY = 0.5f * (r32)buffer->height;
+    for (i32 relRow =  -10; relRow < 10; ++relRow)
+    {
+	for (i32 relColumn = -20; relColumn < 20; ++relColumn)
+	{
+	    u32 column = gameState->cameraP.absTileX + relColumn;
+	    u32 row = gameState->cameraP.absTileY + relRow;
+	    u32 tileId = GetTileValue(tileMap, column, row, gameState->cameraP.absTileZ);
+
+	    if (tileId >= 1)
+	    {
+		r32 gray = 0.5f;
+		if (tileId == 2)
+		{
+		    gray = 1.0f;
+		}
+		if (tileId == 1)
+		{
+		    gray = 0.5f;
+		}
+
+		if (tileId > 2)
+		{
+		    gray = 0.25f;
+		}
+
+		if ((column == gameState->cameraP.absTileX) && (row == gameState->cameraP.absTileY))
+		{
+		    gray = 0.0f;
+		}
+
+		v2 tileSide = {0.5f * tileSideInPixels, 0.5f * tileSideInPixels};
+		v2 cen = {screenCenterX - metersToPixels * gameState->cameraP.offset.x +
+		    ((r32)relColumn) * tileSideInPixels,
+		    screenCenterY + metersToPixels * gameState->cameraP.offset.y -
+		    ((r32)relRow) * tileSideInPixels};
+		v2 min = cen - tileSide;
+		v2 max = cen + tileSide;
+
+		DrawRectangle(buffer, min, max, gray, gray, gray);
+	    }
+	}
+    }
+    
 
     //draw our player
     r32 playerR = 1.0f;
@@ -182,8 +282,4 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     r32 playerTop = gameState->playerY - playerHeight;
     r32 playerLeft = gameState->playerX - 0.5f * playerWidth;
 
-    DrawRectangle(buffer, playerLeft, playerTop,
-		  playerLeft + playerWidth,
-		  playerTop + playerHeight,
-		  playerR, playerG, playerB);
 }

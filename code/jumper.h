@@ -37,6 +37,8 @@ typedef uint64_t u64;
 typedef float r32;
 typedef double r64;
 
+typedef size_t memory_index;
+
 #define BITS_PER_SAMPLE 16
 #define SAMPLES_PER_SEC 44100
 #define AUDIO_BUFFER_SIZE_CYCLES 10
@@ -48,6 +50,8 @@ typedef double r64;
 #define AUDIO_BUFFER_SIZE_BYTES AUDIO_BUFFER_SIZE_SAMPLES * BITS_PER_SAMPLE / 8
 
 #include "jumper_intrinsics.h"
+#include "jumper_math.h"
+#include "jumper_tile.h"
 
 struct game_offscreen_buffer
 {
@@ -124,6 +128,52 @@ struct game_sound_info
     u8 buffer[AUDIO_BUFFER_SIZE_BYTES];
 };
 
+inline game_controller_input* GetController(game_input* input, int unsigned controllerIndex)
+{
+    game_controller_input* result = &input->controllers[controllerIndex];
+    return(result);
+}
+
+#define GAME_UPDATE_AND_RENDER(name) void name(game_offscreen_buffer* buffer, game_memory* memory, game_input* input)
+typedef GAME_UPDATE_AND_RENDER(game_update_and_render);
+
+#define GAME_GET_SOUND_DATA(name) void name(game_sound_info* soundInfo)
+typedef GAME_GET_SOUND_DATA(game_get_sound_data);
+
+struct memory_arena
+{
+    memory_index size;
+    u8* base;
+    memory_index used;
+};
+
+internal void
+InitializeArena(memory_arena* arena, memory_index size, u8* base)
+{
+    arena->size = size;
+    arena->base = base;
+    arena->used = 0;
+}
+
+#define PushStruct(arena, type) (type*)PushSize_(arena, sizeof(type))
+#define PushArray(arena, count, type) (type*)PushSize_(arena, (count)*sizeof(type))
+void* PushSize_(memory_arena* arena, memory_index size)
+{
+    Assert((arena->used + size) <= arena->size);
+    void* result = arena->base + arena->used;
+    arena->used += size;
+
+    return(result);
+}
+
+
+
+struct world
+{
+    tile_map* tileMap;
+};
+
+
 struct game_state
 {
     i32 xOffset;
@@ -131,19 +181,14 @@ struct game_state
 
     r32 playerX;
     r32 playerY;
+
+    u32 cameraFollowingIndex;
+    tile_map_position cameraP;
+
+    memory_arena worldArena;
+    world* world;
 };
 
-inline game_controller_input* GetController(game_input* input, int unsigned controllerIndex)
-{
-    game_controller_input* result = &input->controllers[controllerIndex];
-    return(result);
-}
-
-#define GAME_UPDATE_AND_RENDER(name) void name(game_state* gameState, game_offscreen_buffer* buffer, game_memory* memory, game_input* input)
-typedef GAME_UPDATE_AND_RENDER(game_update_and_render);
-
-#define GAME_GET_SOUND_DATA(name) void name(game_sound_info* soundInfo)
-typedef GAME_GET_SOUND_DATA(game_get_sound_data);
 
 #define JUMPER_H
 #endif

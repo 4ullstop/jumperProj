@@ -937,7 +937,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		    }
 		    if (game.UpdateAndRender)
 		    {
-			game.UpdateAndRender(&gameState, &goBuffer, &gameMemory, newInput);
+			game.UpdateAndRender(&goBuffer, &gameMemory, newInput);
 		    }
 
 		    if (game.GetSoundData)
