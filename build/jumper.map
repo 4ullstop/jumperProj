@@ -1,6 +1,6 @@
  jumper
 
- Timestamp is 680a670f (Thu Apr 24 12:30:07 2025)
+ Timestamp is 680ae063 (Thu Apr 24 21:07:47 2025)
 
  Preferred load address is 0000000180000000
 
@@ -79,16 +79,23 @@
  0000:00000000       __x64_code_ranges_to_entry_points_count 0000000000000000     <absolute>
  0000:00000100       __guard_flags              0000000000000100     <absolute>
  0000:00000000       __ImageBase                0000000180000000     <linker-defined>
- 0001:000072a0       ??G@YA?AUv2@@U0@0@Z        00000001800082a0 f i jumper.obj
- 0001:000072e0       ?GetChunkPositionFor@@YA?AUtile_chunk_position@@PEAUtile_map@@III@Z 00000001800082e0 f i jumper.obj
- 0001:000073a0       ?SetTileValue@@YAIPEAUtile_map@@PEAUtile_chunk@@III@Z 00000001800083a0 f i jumper.obj
- 0001:00007410       ?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 0000000180008410 f i jumper.obj
- 0001:00007440       ?GetTileChunkValueUnchecked@@YAIPEAUtile_map@@PEAUtile_chunk@@II@Z 0000000180008440 f i jumper.obj
- 0001:00007500       ?RoundReal32ToInt32@@YAHM@Z 0000000180008500 f i jumper.obj
- 0001:00007560       ?RoundReal32ToUInt32@@YAIM@Z 0000000180008560 f i jumper.obj
- 0001:000075e0       ?GetTileChunk@@YAPEAUtile_chunk@@PEAUtile_map@@III@Z 00000001800085e0 f i jumper.obj
- 0001:00007690       ?SetTileValueUnchecked@@YAXPEAUtile_map@@PEAUtile_chunk@@III@Z 0000000180008690 f i jumper.obj
- 0001:00007780       ??H@YA?AUv2@@U0@0@Z        0000000180008780 f i jumper.obj
+ 0001:000072a0       ??D@YA?AUv2@@MU0@@Z        00000001800082a0 f i jumper.obj
+ 0001:000072e0       ??G@YA?AUv2@@U0@0@Z        00000001800082e0 f i jumper.obj
+ 0001:00007320       ?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 0000000180008320 f i jumper.obj
+ 0001:00007350       ?Inner@@YAMUv2@@0@Z        0000000180008350 f i jumper.obj
+ 0001:000073a0       ?CenteredTilePoint@@YA?AUtile_map_position@@III@Z 00000001800083a0 f i jumper.obj
+ 0001:00007440       ??Yv2@@QEAAAEAU0@U0@@Z     0000000180008440 f i jumper.obj
+ 0001:00007490       ?CeilReal32ToInt32@@YAHM@Z 0000000180008490 f i jumper.obj
+ 0001:000074c0       ?LengthSq@@YAMUv2@@@Z      00000001800084c0 f i jumper.obj
+ 0001:000074f0       ?RoundReal32ToInt32@@YAHM@Z 00000001800084f0 f i jumper.obj
+ 0001:00007520       ?GetEntity@@YAPEAUentity@@PEAUgame_state@@I@Z 0000000180008520 f i jumper.obj
+ 0001:00007570       ?RoundReal32ToUInt32@@YAIM@Z 0000000180008570 f i jumper.obj
+ 0001:000075a0       ?Square@@YAMM@Z            00000001800085a0 f i jumper.obj
+ 0001:000075e0       ??Xv2@@QEAAAEAU0@M@Z       00000001800085e0 f i jumper.obj
+ 0001:00007620       ?SetTileValue@@YAIPEAUtile_map@@PEAUtile_chunk@@III@Z 0000000180008620 f i jumper.obj
+ 0001:00007690       ?GetChunkPositionFor@@YA?AUtile_chunk_position@@PEAUtile_map@@III@Z 0000000180008690 f i jumper.obj
+ 0001:00007750       ?SquareRoot@@YAMM@Z        0000000180008750 f i jumper.obj
+ 0001:00007780       ??D@YA?AUv2@@U0@M@Z        0000000180008780 f i jumper.obj
  0001:000077e0       __GSHandlerCheck           00000001800087e0 f   LIBCMTD:gshandler.obj
  0001:00007830       __GSHandlerCheckCommon     0000000180008830 f   LIBCMTD:gshandler.obj
  0001:00007980       __security_check_cookie    0000000180008980 f   LIBCMTD:amdsecgs.obj
@@ -155,6 +162,8 @@
  0001:00009960       _guard_icall_checks_enforced 000000018000a960 f i LIBCMTD:guard_support.obj
  0001:000099b0       _guard_rf_checks_enforced  000000018000a9b0 f i LIBCMTD:guard_support.obj
  0001:000099c0       __isa_available_init       000000018000a9c0 f   LIBCMTD:cpu_disp.obj
+ 0001:00009d70       ??H@YA?AUv2@@U0@0@Z        000000018000ad70 f i jumper.obj
+ 0001:00009db0       ?GetTileChunkValueUnchecked@@YAIPEAUtile_map@@PEAUtile_chunk@@II@Z 000000018000adb0 f i jumper.obj
  0001:00009e50       _get_startup_argv_mode     000000018000ae50 f   LIBCMTD:argv_mode.obj
  0001:00009e60       __scrt_is_ucrt_dll_in_use  000000018000ae60 f   LIBCMTD:ucrt_detection.obj
  0001:00009e90       RtlCaptureContext          000000018000ae90 f   kernel32:KERNEL32.dll
@@ -174,6 +183,8 @@
  0001:00009ee4       GetStartupInfoW            000000018000aee4 f   kernel32:KERNEL32.dll
  0001:00009eea       GetModuleHandleW           000000018000aeea f   kernel32:KERNEL32.dll
  0001:00009ef0       __C_specific_handler       000000018000aef0 f   libvcruntimed:riscchandler.obj
+ 0001:0000a360       ?AbsoluteValue@@YAMM@Z     000000018000b360 f i jumper.obj
+ 0001:0000a390       ?GetTileChunk@@YAPEAUtile_chunk@@PEAUtile_map@@III@Z 000000018000b390 f i jumper.obj
  0001:0000a4e0       ??$?RD@__crt_internal_free_policy@@QEBAXQEBD@Z 000000018000b4e0 f i libvcruntimed:std_type_info.obj
  0001:0000a510       ??$?RX@__crt_internal_free_policy@@QEBAXQEBX@Z 000000018000b510 f i libvcruntimed:std_type_info.obj
  0001:0000a540       ??$__crt_interlocked_compare_exchange_pointer@$$CBDPEAD$$T@@YAPEBDPEDSEBDQEAD$$T@Z 000000018000b540 f i libvcruntimed:std_type_info.obj
@@ -196,6 +207,7 @@
  0001:0000a900       __std_type_info_destroy_list 000000018000b900 f   libvcruntimed:std_type_info.obj
  0001:0000a970       __std_type_info_hash       000000018000b970 f   libvcruntimed:std_type_info.obj
  0001:0000aa50       __std_type_info_name       000000018000ba50 f   libvcruntimed:std_type_info.obj
+ 0001:0000ace0       ?RecanonicalizePosition@@YA?AUtile_map_position@@PEAUtile_map@@U1@@Z 000000018000bce0 f i jumper.obj
  0001:0000ad80       __vcrt_initialize          000000018000bd80 f   libvcruntimed:initialization.obj
  0001:0000add0       __vcrt_thread_attach       000000018000bdd0 f   libvcruntimed:initialization.obj
  0001:0000adf0       __vcrt_thread_detach       000000018000bdf0 f   libvcruntimed:initialization.obj
@@ -288,6 +300,11 @@
  0001:0000e180       ?Destructor@_HeapManager@@QEAAXXZ 000000018000f180 f i libvcruntimed:undname.obj
  0001:0000e240       ?UScore@UnDecorator@@SA?AUStringLiteral@@W4Tokens@@@Z 000000018000f240 f   libvcruntimed:undname.obj
  0001:0000e2f0       ?composeDeclaration@UnDecorator@@CA?AVDName@@AEBV2@@Z 000000018000f2f0 f i libvcruntimed:undname.obj
+ 0001:00010810       ?Offset@@YA?AUtile_map_position@@PEAUtile_map@@U1@Uv2@@@Z 0000000180011810 f i jumper.obj
+ 0001:000108f0       ?RecanonicalizeCoord@@YAXPEAUtile_map@@PEAIPEAM@Z 00000001800118f0 f i jumper.obj
+ 0001:000109b0       ?SetTileValueUnchecked@@YAXPEAUtile_map@@PEAUtile_chunk@@III@Z 00000001800119b0 f i jumper.obj
+ 0001:00010a30       sqrtf                      0000000180011a30 f   libucrtd:sqrtf.obj
+ 0001:00010b70       ceilf                      0000000180011b70 f   libucrtd:ceilf.obj
  0001:00011170       ?doAccessSpecifiers@UnDecorator@@SAHXZ 0000000180012170 f i libvcruntimed:undname.obj
  0001:000111b0       ?doAllocationLanguage@UnDecorator@@SAHXZ 00000001800121b0 f i libvcruntimed:undname.obj
  0001:000111f0       ?doAllocationModel@UnDecorator@@SAHXZ 00000001800121f0 f i libvcruntimed:undname.obj
@@ -2759,8 +2776,9 @@
  0001:000dae80       _local_unwind              00000001800dbe80 f   libvcruntimed:jmpuwind.obj
  0001:000daeb3       RtlUnwind                  00000001800dbeb3 f   kernel32:KERNEL32.dll
  0001:000daf00       ?PushSize_@@YAPEAXPEAUmemory_arena@@_K@Z 00000001800dbf00 f   jumper.obj
- 0001:000db4d0       GameGetSoundData           00000001800dc4d0 f   jumper.obj
- 0001:000db510       GameUpdateAndRender        00000001800dc510 f   jumper.obj
+ 0001:000db290       ?Subtract@@YA?AUtile_map_difference@@PEAUtile_map@@PEAUtile_map_position@@1@Z 00000001800dc290 f   jumper.obj
+ 0001:000dc420       GameGetSoundData           00000001800dd420 f   jumper.obj
+ 0001:000dc460       GameUpdateAndRender        00000001800dd460 f   jumper.obj
  0001:000df4f0       _guard_dispatch_icall_nop  00000001800e04f0 f   LIBCMTD:guard_dispatch.obj
  0001:000df510       _guard_xfg_dispatch_icall_nop 00000001800e0510 f   LIBCMTD:guard_xfg_dispatch.obj
  0001:000e0550       memcpy_repmovs             00000001800e1550 f   libvcruntimed:memcpy.obj
@@ -2784,22 +2802,30 @@
  0002:000008b0       __xp_z                     00000001800e68b0     LIBCMTD:initializers.obj
  0002:000009c0       __xt_a                     00000001800e69c0     LIBCMTD:initializers.obj
  0002:00000ad0       __xt_z                     00000001800e6ad0     LIBCMTD:initializers.obj
- 0002:00000be0       __real@3e800000            00000001800e6be0     jumper.obj
- 0002:00000be4       __real@3f000000            00000001800e6be4     jumper.obj
- 0002:00000be8       __real@3f400000            00000001800e6be8     jumper.obj
- 0002:00000bec       __real@bf800000            00000001800e6bec     jumper.obj
+ 0002:00000be0       __real@00000000            00000001800e6be0     jumper.obj
+ 0002:00000be4       __real@38d1b717            00000001800e6be4     jumper.obj
+ 0002:00000be8       __real@3e800000            00000001800e6be8     jumper.obj
+ 0002:00000bec       __real@42480000            00000001800e6bec     jumper.obj
  0002:00000bf0       __real@3fa015bf9999999a    00000001800e6bf0     jumper.obj
- 0002:00000bf8       __real@c1f00000            00000001800e6bf8     jumper.obj
+ 0002:00000bf8       __real@42700000            00000001800e6bf8     jumper.obj
+ 0002:00000bfc       __real@437f0000            00000001800e6bfc     jumper.obj
  0002:00000c00       __real@3fe0000000000000    00000001800e6c00     jumper.obj
+ 0002:00000c08       __real@bf000000            00000001800e6c08     jumper.obj
+ 0002:00000c0c       __real@bf00068e            00000001800e6c0c     jumper.obj
  0002:00000c10       __real@40dfffc000000000    00000001800e6c10     jumper.obj
- 0002:00000c1c       __real@3f800000            00000001800e6c1c     jumper.obj
- 0002:00000c20       __real@3fb33333            00000001800e6c20     jumper.obj
- 0002:00000c24       __real@42700000            00000001800e6c24     jumper.obj
- 0002:00000c28       __real@43000000            00000001800e6c28     jumper.obj
- 0002:00000c2c       __real@437f0000            00000001800e6c2c     jumper.obj
+ 0002:00000c18       __real@bf800000            00000001800e6c18     jumper.obj
+ 0002:00000c1c       __real@3f000000            00000001800e6c1c     jumper.obj
+ 0002:00000c20       __real@3f0000a8            00000001800e6c20     jumper.obj
+ 0002:00000c24       __real@3f400000            00000001800e6c24     jumper.obj
+ 0002:00000c28       __real@3f800000            00000001800e6c28     jumper.obj
+ 0002:00000c2c       __real@3fb33333            00000001800e6c2c     jumper.obj
  0002:00000c30       _pDefaultRawDllMain        00000001800e6c30     LIBCMTD:dll_dllmain.obj
  0002:00000c30       _pRawDllMain               00000001800e6c30     LIBCMTD:dll_dllmain.obj
+ 0002:00000c38       __real@c0e00000            00000001800e6c38     jumper.obj
+ 0002:00000c3c       __real@c1f00000            00000001800e6c3c     jumper.obj
+ 0002:00000c50       __xmm@7fffffffffffffff7fffffffffffffff 00000001800e6c50     jumper.obj
  0002:00000c60       ??_C@_0EC@CDJPIOJK@D?3?2a?2_work?21?2s?2src?2vctools?2crt?2@ 00000001800e6c60     libvcruntimed:std_type_info.obj
+ 0002:00000ca4       ??_C@_05KGFAIMPG@sqrtf@    00000001800e6ca4     libucrtd:sqrtf.obj
  0002:00000cb0       _pDestructExceptionObject  00000001800e6cb0     libvcruntimed:ehhelpers.obj
  0002:00001540       ??_C@_08EHJDFFNH@__based?$CI@ 00000001800e7540     libvcruntimed:undname.obj
  0002:00001550       ??_C@_07KOLFKCDI@__cdecl@  00000001800e7550     libvcruntimed:undname.obj
@@ -4644,6 +4670,9 @@
  Static symbols
 
  0000:ffed4000       .debug$S                   0000000180000000     jumper.exp
+ 0000:00000000       _volmd                     0000000180000000     jumper.obj
+ 0000:00000000       _volmd                     0000000180000000     jumper.obj
+ 0000:00000000       _volmd                     0000000180000000     jumper.obj
  0000:00000000       _volmd                     0000000180000000     jumper.obj
  0000:00000000       _volmd                     0000000180000000     jumper.obj
  0000:ffed6000       __guard_xfg??$console_output_reopen_and_retry@V<lambda_61c1b8a38cedca4df5fdc542e6ccae6d>@@@@YAHAEBV<lambda_61c1b8a38cedca4df5fdc542e6ccae6d>@@@Z 0000000180000000     libucrtd:initcon.obj
@@ -8871,6 +8900,8 @@
  0000:00000000       _volmd                     0000000180000000     libucrtd:sincos_special.obj
  0000:ffed6000       __guard_xfgceil            0000000180000000     libucrtd:ceil.obj
  0000:00000000       _volmd                     0000000180000000     libucrtd:ceil.obj
+ 0000:ffed6000       __guard_xfgceilf           0000000180000000     libucrtd:ceilf.obj
+ 0000:00000000       _volmd                     0000000180000000     libucrtd:ceilf.obj
  0000:ffed6000       __guard_xfg_call_matherr   0000000180000000     libucrtd:libm_error.obj
  0000:ffed6000       __guard_xfg_exception_enabled 0000000180000000     libucrtd:libm_error.obj
  0000:ffed6000       __guard_xfg_handle_error   0000000180000000     libucrtd:libm_error.obj
@@ -8881,6 +8912,8 @@
  0000:00000000       _volmd                     0000000180000000     libucrtd:libm_error.obj
  0000:00000000       _volmd                     0000000180000000     libucrtd:libm_error.obj
  0000:00000000       _volmd                     0000000180000000     libucrtd:libm_error.obj
+ 0000:ffed6000       __guard_xfgsqrtf           0000000180000000     libucrtd:sqrtf.obj
+ 0000:00000000       _volmd                     0000000180000000     libucrtd:sqrtf.obj
  0000:ffed6000       __guard_xfg??$__acrt_fenv_shift_bits@W4__acrt_fenv_abstract_control@@@@YA?AW4__acrt_fenv_abstract_control@@W40@0I@Z 0000000180000000     libucrtd:_fenvutils.obj
  0000:ffed6000       __guard_xfg??$__acrt_fenv_shift_bits@W4__acrt_fenv_abstract_status@@@@YA?AW4__acrt_fenv_abstract_status@@W40@0I@Z 0000000180000000     libucrtd:_fenvutils.obj
  0000:ffed6000       __guard_xfg??$__acrt_fenv_translate_bit@W4__acrt_fenv_abstract_control@@W4__acrt_fenv_machine_sse_control@@@@YA?AW4__acrt_fenv_abstract_control@@W4__acrt_fenv_machine_sse_control@@0W40@1@Z 0000000180000000     libucrtd:_fenvutils.obj
@@ -9168,6 +9201,9 @@
  0000:00000000       _volmd                     0000000180000000     libvcruntimed:winapi_downlevel.obj
  0000:ffed8004       __guard_fids__             0000000180000004     libucrtd:stdio_initializer.obj
  0000:00000010       _volmd                     0000000180000010     jumper.obj
+ 0000:00000020       _volmd                     0000000180000020     jumper.obj
+ 0000:00000030       _volmd                     0000000180000030     jumper.obj
+ 0000:00000040       _volmd                     0000000180000040     jumper.obj
  0001:00007970       $$000000                   0000000180008970     LIBCMTD:amdsecgs.obj
  0001:000079b0       ?dllmain_crt_dispatch@@YAHQEAUHINSTANCE__@@KQEAX@Z 00000001800089b0 f   LIBCMTD:dll_dllmain.obj
  0001:00007a60       ?dllmain_crt_process_attach@@YAHQEAUHINSTANCE__@@QEAX@Z 0000000180008a60 f   LIBCMTD:dll_dllmain.obj
@@ -10184,9 +10220,15 @@
  0001:000daec0       ?InitializeArena@@YAXPEAUmemory_arena@@_KPEAE@Z 00000001800dbec0 f   jumper.obj
  0001:000daf70       ?GetTileValue@@YAIPEAUtile_map@@PEAUtile_chunk@@II@Z 00000001800dbf70 f   jumper.obj
  0001:000dafd0       ?GetTileValue@@YAIPEAUtile_map@@III@Z 00000001800dbfd0 f   jumper.obj
- 0001:000db0c0       ?SetTileValue@@YAXPEAUmemory_arena@@PEAUtile_map@@IIII@Z 00000001800dc0c0 f   jumper.obj
- 0001:000db240       ?DrawRectangle@@YAXPEAUgame_offscreen_buffer@@Uv2@@1MMM@Z 00000001800dc240 f   jumper.obj
- 0001:000db420       ?FillSinWaveSoundBuffer@@YAXPEAUgame_sound_info@@@Z 00000001800dc420 f   jumper.obj
+ 0001:000db0c0       ?GetTileValue@@YAIPEAUtile_map@@Utile_map_position@@@Z 00000001800dc0c0 f   jumper.obj
+ 0001:000db110       ?SetTileValue@@YAXPEAUmemory_arena@@PEAUtile_map@@IIII@Z 00000001800dc110 f   jumper.obj
+ 0001:000db3f0       ?IsTileValueEmpty@@YAHI@Z  00000001800dc3f0 f   jumper.obj
+ 0001:000db430       ?DrawRectangle@@YAXPEAUgame_offscreen_buffer@@Uv2@@1MMM@Z 00000001800dc430 f   jumper.obj
+ 0001:000db610       ?FillSinWaveSoundBuffer@@YAXPEAUgame_sound_info@@@Z 00000001800dc610 f   jumper.obj
+ 0001:000db6c0       ?AddEntity@@YAIPEAUgame_state@@@Z 00000001800dc6c0 f   jumper.obj
+ 0001:000db730       ?InitializePlayer@@YAXPEAUgame_state@@I@Z 00000001800dc730 f   jumper.obj
+ 0001:000db7e0       ?TestWall@@YAHMMMMMPEAMMM@Z 00000001800dc7e0 f   jumper.obj
+ 0001:000db8f0       ?MovePlayer@@YAXPEAUgame_state@@PEAUentity@@MUv2@@@Z 00000001800dc8f0 f   jumper.obj
  0001:000df4e0       $$000000                   00000001800e04e0     LIBCMTD:guard_dispatch.obj
  0001:000df500       $$000000                   00000001800e0500     LIBCMTD:guard_xfg_dispatch.obj
  0001:000e0550       $$000000                   00000001800e1550     libvcruntimed:memcpy.obj
@@ -10686,14 +10728,14 @@
  0002:00027f50       SetSmallYmm                000000018010df50     libvcruntimed:memset.obj
  0002:00027f74       SetSmallYmmNT              000000018010df74     libvcruntimed:memset.obj
  0002:00027f98       SetSmallXmm                000000018010df98     libvcruntimed:memset.obj
- 0002:00029038       $unwind$?RoundReal32ToInt32@@YAHM@Z 000000018010f038     jumper.obj
- 0002:00029040       $unwind$?RoundReal32ToUInt32@@YAIM@Z 000000018010f040     jumper.obj
- 0002:00029048       $unwind$??H@YA?AUv2@@U0@0@Z 000000018010f048     jumper.obj
- 0002:00029050       $unwind$??G@YA?AUv2@@U0@0@Z 000000018010f050     jumper.obj
- 0002:00029058       $unwind$?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 000000018010f058     jumper.obj
- 0002:00029060       $unwind$?GetTileChunk@@YAPEAUtile_chunk@@PEAUtile_map@@III@Z 000000018010f060     jumper.obj
- 0002:0002906c       $unwind$?SetTileValue@@YAIPEAUtile_map@@PEAUtile_chunk@@III@Z 000000018010f06c     jumper.obj
- 0002:00029074       $unwind$?GetTileChunkValueUnchecked@@YAIPEAUtile_map@@PEAUtile_chunk@@II@Z 000000018010f074     jumper.obj
+ 0002:00029038       $unwind$?SquareRoot@@YAMM@Z 000000018010f038     jumper.obj
+ 0002:00029040       $unwind$?AbsoluteValue@@YAMM@Z 000000018010f040     jumper.obj
+ 0002:00029048       $unwind$?RoundReal32ToInt32@@YAHM@Z 000000018010f048     jumper.obj
+ 0002:00029050       $unwind$?RoundReal32ToUInt32@@YAIM@Z 000000018010f050     jumper.obj
+ 0002:00029058       $unwind$?CeilReal32ToInt32@@YAHM@Z 000000018010f058     jumper.obj
+ 0002:00029060       $unwind$??H@YA?AUv2@@U0@0@Z 000000018010f060     jumper.obj
+ 0002:0002906c       $unwind$??Xv2@@QEAAAEAU0@M@Z 000000018010f06c     jumper.obj
+ 0002:00029074       $unwind$??D@YA?AUv2@@U0@M@Z 000000018010f074     jumper.obj
  0002:0002907c       $unwind$__GSHandlerCheckCommon 000000018010f07c     LIBCMTD:gshandler.obj
  0002:00029084       $unwind$__GSHandlerCheck   000000018010f084     LIBCMTD:gshandler.obj
  0002:00029090       $xdatasym                  000000018010f090     LIBCMTD:amdsecgs.obj
@@ -11135,6 +11177,7 @@
  0002:0002a144       $unwind$?begin@HandlerMap@__FrameHandler3@@QEAA?AViterator@12@XZ 0000000180110144     libvcruntimed:frame.obj
  0002:0002a14c       $unwind$?end@HandlerMap@__FrameHandler3@@QEAA?AViterator@12@XZ 000000018011014c     libvcruntimed:frame.obj
  0002:0002a154       $unwind$?FrameUnwindToState@__FrameHandler4@@SAXPEA_KPEAU_xDISPATCHER_CONTEXT@@PEAUFuncInfo4@FH4@@H@Z 0000000180110154     libvcruntimed:frame.obj
+ 0002:0002a18c       $unwind$??G@YA?AUv2@@U0@0@Z 000000018011018c     jumper.obj
  0002:0002a194       $unwind$?filt$0@?0??FrameUnwindToState@__FrameHandler4@@SAXPEA_KPEAU_xDISPATCHER_CONTEXT@@PEAUFuncInfo4@FH4@@H@Z@4HA 0000000180110194     libvcruntimed:frame.obj
  0002:0002a19c       $unwind$?fin$1@?0??FrameUnwindToState@__FrameHandler4@@SAXPEA_KPEAU_xDISPATCHER_CONTEXT@@PEAUFuncInfo4@FH4@@H@Z@4HA 000000018011019c     libvcruntimed:frame.obj
  0002:0002a1a4       $unwind$?GetHandlerSearchState@__FrameHandler4@@SAHPEA_KPEAU_xDISPATCHER_CONTEXT@@PEAUFuncInfo4@FH4@@@Z 00000001801101a4     libvcruntimed:frame.obj
@@ -11229,6 +11272,7 @@
  0002:0002a588       $unwind$?close@__crt_hmodule_traits@@SA_NPEAUHINSTANCE__@@@Z 0000000180110588     libucrtd:exit.obj
  0002:0002a590       $unwind$?is_managed_app@@YA_NXZ 0000000180110590     libucrtd:exit.obj
  0002:0002a598       $unwind$?try_cor_exit_process@@YAXI@Z 0000000180110598     libucrtd:exit.obj
+ 0002:0002a5a8       $unwind$?Square@@YAMM@Z    00000001801105a8     jumper.obj
  0002:0002a5b0       $ip2state$?try_cor_exit_process@@YAXI@Z 00000001801105b0     libucrtd:exit.obj
  0002:0002a5b8       $unwind$??1?$__crt_unique_handle_t@U__crt_hmodule_traits@@@@QEAA@XZ 00000001801105b8     libucrtd:exit.obj
  0002:0002a5c0       $unwind$?close@?$__crt_unique_handle_t@U__crt_hmodule_traits@@@@QEAAXXZ 00000001801105c0     libucrtd:exit.obj
@@ -11238,6 +11282,7 @@
  0002:0002a5e0       $unwind$??$?B$$A6AXPEAXK0@Z@__crt_fast_encoded_nullptr_t@@QEBAP6AXPEAXK0@ZXZ 00000001801105e0     libucrtd:exit.obj
  0002:0002a5e8       $unwind$??$__crt_fast_encode_pointer@P6AXPEAXK0@Z@@YAP6AXPEAXK0@ZQ6AX0K0@Z@Z 00000001801105e8     libucrtd:exit.obj
  0002:0002a5f0       $unwind$?common_exit@@YAXHW4_crt_exit_cleanup_mode@@W4_crt_exit_return_mode@@@Z 00000001801105f0     libucrtd:exit.obj
+ 0002:0002a600       $unwind$?Inner@@YAMUv2@@0@Z 0000000180110600     jumper.obj
  0002:0002a608       $ip2state$?common_exit@@YAXHW4_crt_exit_cleanup_mode@@W4_crt_exit_return_mode@@@Z 0000000180110608     libucrtd:exit.obj
  0002:0002a610       $unwind$??R<lambda_6e4b09c48022b2350581041d5f6b0c4c>@@QEBA@XZ 0000000180110610     libucrtd:exit.obj
  0002:0002a634       $unwind$?filt$0@?0???R<lambda_6e4b09c48022b2350581041d5f6b0c4c>@@QEBA@XZ@4HA 0000000180110634     libucrtd:exit.obj
@@ -11264,6 +11309,7 @@
  0002:0002a704       $unwind$??$common_configure_argv@D@@YAHW4_crt_argv_mode@@@Z 0000000180110704     libucrtd:argv_parsing.obj
  0002:0002a718       $ip2state$??$common_configure_argv@D@@YAHW4_crt_argv_mode@@@Z 0000000180110718     libucrtd:argv_parsing.obj
  0002:0002a720       $unwind$??$common_configure_argv@_W@@YAHW4_crt_argv_mode@@@Z 0000000180110720     libucrtd:argv_parsing.obj
+ 0002:0002a730       $unwind$?LengthSq@@YAMUv2@@@Z 0000000180110730     jumper.obj
  0002:0002a738       $ip2state$??$common_configure_argv@_W@@YAHW4_crt_argv_mode@@@Z 0000000180110738     libucrtd:argv_parsing.obj
  0002:0002a740       $unwind$??$?RE@__crt_internal_free_policy@@QEBAXQEBE@Z 0000000180110740     libucrtd:argv_parsing.obj
  0002:0002a748       $unwind$??$get_module_file_name@$$TAEAY0BAF@DH@?$__crt_char_traits@D@@SAK$$QEA$$TAEAY0BAF@D$$QEAH@Z 0000000180110748     libucrtd:argv_parsing.obj
@@ -11307,9 +11353,11 @@
  0002:0002a878       $unwind$??$common_initialize_environment_nolock@_W@@YAHXZ 0000000180110878     libucrtd:environment_initialization.obj
  0002:0002a880       $unwind$??$uninitialize_environment_internal@D@@YAXAEAPEAPEAD@Z 0000000180110880     libucrtd:environment_initialization.obj
  0002:0002a888       $unwind$??$uninitialize@A6AXAEAPEAPEAD@_E@?$dual_state_global@PEAPEAD@__crt_state_management@@QEAAXA6AXAEAPEAPEAD@_E@Z 0000000180110888     libucrtd:environment_initialization.obj
+ 0002:0002a898       $unwind$?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 0000000180110898     jumper.obj
  0002:0002a8a0       $ip2state$??$uninitialize@A6AXAEAPEAPEAD@_E@?$dual_state_global@PEAPEAD@__crt_state_management@@QEAAXA6AXAEAPEAPEAD@_E@Z 00000001801108a0     libucrtd:environment_initialization.obj
  0002:0002a8a8       $unwind$??$uninitialize_environment_internal@_W@@YAXAEAPEAPEA_W@Z 00000001801108a8     libucrtd:environment_initialization.obj
  0002:0002a8b0       $unwind$??$uninitialize@A6AXAEAPEAPEA_W@_E@?$dual_state_global@PEAPEA_W@__crt_state_management@@QEAAXA6AXAEAPEAPEA_W@_E@Z 00000001801108b0     libucrtd:environment_initialization.obj
+ 0002:0002a8c0       $unwind$?SetTileValue@@YAIPEAUtile_map@@PEAUtile_chunk@@III@Z 00000001801108c0     jumper.obj
  0002:0002a8c8       $ip2state$??$uninitialize@A6AXAEAPEAPEA_W@_E@?$dual_state_global@PEAPEA_W@__crt_state_management@@QEAAXA6AXAEAPEAPEA_W@_E@Z 00000001801108c8     libucrtd:environment_initialization.obj
  0002:0002a8d0       $unwind$??$free_environment@D@@YAXQEAPEAD@Z 00000001801108d0     libucrtd:environment_initialization.obj
  0002:0002a8d8       $unwind$??$free_environment@_W@@YAXQEAPEA_W@Z 00000001801108d8     libucrtd:environment_initialization.obj
@@ -11332,8 +11380,10 @@
  0002:0002a960       $unwind$?is_valid@?$__crt_unique_heap_ptr@PEA_WU__crt_internal_free_policy@@@@QEBA_NXZ 0000000180110960     libucrtd:environment_initialization.obj
  0002:0002a968       $unwind$??B?$__crt_unique_heap_ptr@PEA_WU__crt_internal_free_policy@@@@QEBA_NXZ 0000000180110968     libucrtd:environment_initialization.obj
  0002:0002a970       $unwind$??$initialize_environment_by_cloning_nolock@D@@YAHXZ 0000000180110970     libucrtd:environment_initialization.obj
+ 0002:0002a980       $unwind$?GetTileChunk@@YAPEAUtile_chunk@@PEAUtile_map@@III@Z 0000000180110980     jumper.obj
  0002:0002a988       $ip2state$??$initialize_environment_by_cloning_nolock@D@@YAHXZ 0000000180110988     libucrtd:environment_initialization.obj
  0002:0002a990       $unwind$??$initialize_environment_by_cloning_nolock@_W@@YAHXZ 0000000180110990     libucrtd:environment_initialization.obj
+ 0002:0002a9a0       $unwind$?GetTileChunkValueUnchecked@@YAIPEAUtile_map@@PEAUtile_chunk@@II@Z 00000001801109a0     jumper.obj
  0002:0002a9a8       $ip2state$??$initialize_environment_by_cloning_nolock@_W@@YAHXZ 00000001801109a8     libucrtd:environment_initialization.obj
  0002:0002a9b0       $unwind$??$?R_W@__crt_internal_free_policy@@QEBAXQEB_W@Z 00000001801109b0     libucrtd:environment_initialization.obj
  0002:0002a9b8       $unwind$??$count_variables_in_environment_block@D@@YA?B_KQEAD@Z 00000001801109b8     libucrtd:environment_initialization.obj
@@ -11359,6 +11409,7 @@
  0002:0002aa58       $unwind$??$__crt_fast_encode_pointer@P6AHXZ@@YAP6AHXZQ6AHXZ@Z 0000000180110a58     libucrtd:onexit.obj
  0002:0002aa60       $unwind$??$__crt_fast_encode_pointer@PEAP6AXXZ@@YAPEAP6AXXZQEAP6AXXZ@Z 0000000180110a60     libucrtd:onexit.obj
  0002:0002aa68       $unwind$??$__acrt_lock_and_call@V<lambda_208ce30acdd7200aa596f2796f4d5154>@@@@YAHW4__acrt_lock_id@@$$QEAV<lambda_208ce30acdd7200aa596f2796f4d5154>@@@Z 0000000180110a68     libucrtd:onexit.obj
+ 0002:0002aa78       $unwind$?RecanonicalizeCoord@@YAXPEAUtile_map@@PEAIPEAM@Z 0000000180110a78     jumper.obj
  0002:0002aa80       $ip2state$??$__acrt_lock_and_call@V<lambda_208ce30acdd7200aa596f2796f4d5154>@@@@YAHW4__acrt_lock_id@@$$QEAV<lambda_208ce30acdd7200aa596f2796f4d5154>@@@Z 0000000180110a80     libucrtd:onexit.obj
  0002:0002aa88       $unwind$??R<lambda_d121dba8a4adeaf3a9819e48611155df>@@QEBA@XZ 0000000180110a88     libucrtd:onexit.obj
  0002:0002aa9c       $stateUnwindMap$??R<lambda_d121dba8a4adeaf3a9819e48611155df>@@QEBA@XZ 0000000180110a9c     libucrtd:onexit.obj
@@ -11392,6 +11443,7 @@
  0002:0002abd8       $unwind$uninitialize_allocated_memory 0000000180110bd8     libucrtd:initialization.obj
  0002:0002abe0       $unwind$??R<lambda_af27fe6ede5d83bbdbd622796c194e9c>@@QEBA@AEAPEAU__crt_multibyte_data@@@Z 0000000180110be0     libucrtd:initialization.obj
  0002:0002abe8       $unwind$??$uninitialize@V<lambda_af27fe6ede5d83bbdbd622796c194e9c>@@@?$dual_state_global@PEAU__crt_multibyte_data@@@__crt_state_management@@QEAAX$$QEAV<lambda_af27fe6ede5d83bbdbd622796c194e9c>@@@Z 0000000180110be8     libucrtd:initialization.obj
+ 0002:0002abf8       $unwind$?GetEntity@@YAPEAUentity@@PEAUgame_state@@I@Z 0000000180110bf8     jumper.obj
  0002:0002ac00       $ip2state$??$uninitialize@V<lambda_af27fe6ede5d83bbdbd622796c194e9c>@@@?$dual_state_global@PEAU__crt_multibyte_data@@@__crt_state_management@@QEAAX$$QEAV<lambda_af27fe6ede5d83bbdbd622796c194e9c>@@@Z 0000000180110c00     libucrtd:initialization.obj
  0002:0002ac08       $unwind$uninitialize_allocated_io_buffers 0000000180110c08     libucrtd:initialization.obj
  0002:0002ac10       $unwind$report_memory_leaks 0000000180110c10     libucrtd:initialization.obj
@@ -11461,12 +11513,14 @@
  0002:0002afac       $unwind$?realloc_dbg_nolock@@YAPEAXQEAXQEA_KHQEBDH_N@Z 0000000180110fac     libucrtd:debug_heap.obj
  0002:0002afc0       $ip2state$?realloc_dbg_nolock@@YAPEAXQEAXQEA_KHQEBDH_N@Z 0000000180110fc0     libucrtd:debug_heap.obj
  0002:0002afc8       $unwind$?free_dbg_nolock@@YAXQEAXH@Z 0000000180110fc8     libucrtd:debug_heap.obj
+ 0002:0002afd8       $unwind$sqrtf              0000000180110fd8     libucrtd:sqrtf.obj
  0002:0002afe0       $ip2state$?free_dbg_nolock@@YAXQEAXH@Z 0000000180110fe0     libucrtd:debug_heap.obj
  0002:0002afe8       $unwind$_CrtSetDbgBlockType 0000000180110fe8     libucrtd:debug_heap.obj
  0002:0002b00c       $unwind$_CrtSetDbgBlockType$fin$0 000000018011100c     libucrtd:debug_heap.obj
  0002:0002b014       $unwind$?check_block@@YA_NQEAU_CrtMemBlockHeader@@@Z 0000000180111014     libucrtd:debug_heap.obj
  0002:0002b01c       $unwind$?print_block_data@@YAXQEAU__crt_locale_pointers@@QEAU_CrtMemBlockHeader@@@Z 000000018011101c     libucrtd:debug_heap.obj
  0002:0002b030       $unwind$?dump_all_object_since_nolock@@YAXQEBU_CrtMemState@@@Z 0000000180111030     libucrtd:debug_heap.obj
+ 0002:0002b040       $unwind$ceilf              0000000180111040     libucrtd:ceilf.obj
  0002:0002b048       $ip2state$?dump_all_object_since_nolock@@YAXQEBU_CrtMemState@@@Z 0000000180111048     libucrtd:debug_heap.obj
  0002:0002b050       $unwind$strcpy_s           0000000180111050     libucrtd:strcpy_s.obj
  0002:0002b058       $unwind$??$common_tcscpy_s@D@@YAHQEAD_KQEBD@Z 0000000180111058     libucrtd:strcpy_s.obj
@@ -13605,15 +13659,27 @@
  0002:00030218       $xdatasym$memcmp           0000000180116218     libvcruntimed:memcmp.obj
  0002:0003021c       $unwind$strrchr            000000018011621c     libvcruntimed:strrchr.obj
  0002:00030224       $unwind$_local_unwind      0000000180116224     libvcruntimed:jmpuwind.obj
- 0002:0003022c       $unwind$?PushSize_@@YAPEAXPEAUmemory_arena@@_K@Z 000000018011622c     jumper.obj
- 0002:00030234       $unwind$?GetTileValue@@YAIPEAUtile_map@@PEAUtile_chunk@@II@Z 0000000180116234     jumper.obj
- 0002:0003023c       $unwind$?GetTileValue@@YAIPEAUtile_map@@III@Z 000000018011623c     jumper.obj
- 0002:00030250       $unwind$?SetTileValue@@YAXPEAUmemory_arena@@PEAUtile_map@@IIII@Z 0000000180116250     jumper.obj
- 0002:00030264       $unwind$?DrawRectangle@@YAXPEAUgame_offscreen_buffer@@Uv2@@1MMM@Z 0000000180116264     jumper.obj
- 0002:0003026c       $unwind$?FillSinWaveSoundBuffer@@YAXPEAUgame_sound_info@@@Z 000000018011626c     jumper.obj
- 0002:00030274       $unwind$GameGetSoundData   0000000180116274     jumper.obj
- 0002:0003027c       $unwind$GameUpdateAndRender 000000018011627c     jumper.obj
- 0002:00030284       $unwind$?GetChunkPositionFor@@YA?AUtile_chunk_position@@PEAUtile_map@@III@Z 0000000180116284     jumper.obj
+ 0002:0003022c       $unwind$??D@YA?AUv2@@MU0@@Z 000000018011622c     jumper.obj
+ 0002:00030234       $unwind$?GetChunkPositionFor@@YA?AUtile_chunk_position@@PEAUtile_map@@III@Z 0000000180116234     jumper.obj
+ 0002:00030248       $unwind$?RecanonicalizePosition@@YA?AUtile_map_position@@PEAUtile_map@@U1@@Z 0000000180116248     jumper.obj
+ 0002:0003025c       $unwind$?Offset@@YA?AUtile_map_position@@PEAUtile_map@@U1@Uv2@@@Z 000000018011625c     jumper.obj
+ 0002:00030270       $unwind$?CenteredTilePoint@@YA?AUtile_map_position@@III@Z 0000000180116270     jumper.obj
+ 0002:00030284       $unwind$??Yv2@@QEAAAEAU0@U0@@Z 0000000180116284     jumper.obj
+ 0002:00030298       $unwind$?PushSize_@@YAPEAXPEAUmemory_arena@@_K@Z 0000000180116298     jumper.obj
+ 0002:000302a0       $unwind$?GetTileValue@@YAIPEAUtile_map@@PEAUtile_chunk@@II@Z 00000001801162a0     jumper.obj
+ 0002:000302a8       $unwind$?GetTileValue@@YAIPEAUtile_map@@III@Z 00000001801162a8     jumper.obj
+ 0002:000302bc       $unwind$?GetTileValue@@YAIPEAUtile_map@@Utile_map_position@@@Z 00000001801162bc     jumper.obj
+ 0002:000302c4       $unwind$?SetTileValue@@YAXPEAUmemory_arena@@PEAUtile_map@@IIII@Z 00000001801162c4     jumper.obj
+ 0002:000302d8       $unwind$?Subtract@@YA?AUtile_map_difference@@PEAUtile_map@@PEAUtile_map_position@@1@Z 00000001801162d8     jumper.obj
+ 0002:000302ec       $unwind$?IsTileValueEmpty@@YAHI@Z 00000001801162ec     jumper.obj
+ 0002:000302f4       $unwind$?DrawRectangle@@YAXPEAUgame_offscreen_buffer@@Uv2@@1MMM@Z 00000001801162f4     jumper.obj
+ 0002:000302fc       $unwind$?FillSinWaveSoundBuffer@@YAXPEAUgame_sound_info@@@Z 00000001801162fc     jumper.obj
+ 0002:00030304       $unwind$?AddEntity@@YAIPEAUgame_state@@@Z 0000000180116304     jumper.obj
+ 0002:0003030c       $unwind$?InitializePlayer@@YAXPEAUgame_state@@I@Z 000000018011630c     jumper.obj
+ 0002:00030314       $unwind$?TestWall@@YAHMMMMMPEAMMM@Z 0000000180116314     jumper.obj
+ 0002:0003031c       $unwind$?MovePlayer@@YAXPEAUgame_state@@PEAUentity@@MUv2@@@Z 000000018011631c     jumper.obj
+ 0002:00030330       $unwind$GameGetSoundData   0000000180116330     jumper.obj
+ 0002:00030338       $unwind$GameUpdateAndRender 0000000180116338     jumper.obj
  0002:00030ec0       .edata                     0000000180116ec0     jumper.exp
  0002:00030ee8       rgpv                       0000000180116ee8     jumper.exp
  0002:00030ef0       rgszName                   0000000180116ef0     jumper.exp

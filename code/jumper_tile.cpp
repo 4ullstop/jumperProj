@@ -122,3 +122,70 @@ SetTileValue(memory_arena* arena, tile_map* tileMap,
     }
     SetTileValue(tileMap, tileChunk, chunkPos.relTileX, chunkPos.relTileY, tileValue);
 }
+
+inline void
+RecanonicalizeCoord(tile_map* tileMap, u32* tile, r32* tileRel)
+{
+    i32 offset = RoundReal32ToInt32(*tileRel / tileMap->tileSideInMeters);
+
+    *tile += offset;
+    *tileRel -= offset * tileMap->tileSideInMeters;
+
+    Assert(*tileRel >= -0.5001f*tileMap->tileSideInMeters);
+    Assert(*tileRel <= 0.50001f*tileMap->tileSideInMeters);
+}
+
+inline tile_map_position
+RecanonicalizePosition(tile_map* tileMap, tile_map_position pos)
+{
+    tile_map_position result = pos;
+
+    RecanonicalizeCoord(tileMap, &result.absTileX, &result.offset.x);
+    RecanonicalizeCoord(tileMap, &result.absTileY, &result.offset.y);
+
+    return(result);
+}
+
+tile_map_difference
+Subtract(tile_map* tileMap, tile_map_position* a, tile_map_position* b)
+{
+    tile_map_difference result;
+
+    v2 dTileXY = {(r32)a->absTileX - (r32)b->absTileX,
+	(r32)a->absTileY - (r32)b->absTileY};
+    r32 dTileZ = (r32)a->absTileZ - (r32)b->absTileZ;
+
+    result.dXY = tileMap->tileSideInMeters * dTileXY + (a->offset - b->offset);
+    result.dZ = tileMap->tileSideInMeters * dTileZ;
+
+    return(result);
+}
+
+inline tile_map_position
+Offset(tile_map* tileMap, tile_map_position p, v2 offset)
+{
+    p.offset += offset;
+    p = RecanonicalizePosition(tileMap, p);
+
+    return(p);
+}
+
+inline tile_map_position
+CenteredTilePoint(u32 absTileX, u32 absTileY, u32 absTileZ)
+{
+    tile_map_position result = {};
+
+    result.absTileX = absTileX;
+    result.absTileY = absTileY;
+    result.absTileZ = absTileZ;
+
+    return(result);
+}
+
+internal bool32
+IsTileValueEmpty(u32 tileValue)
+{
+    bool32 empty = (tileValue == 1);
+
+    return(empty);
+}

@@ -66,6 +66,17 @@ FillSinWaveSoundBuffer(game_sound_info* gameSoundInfo)
     }
 }
 
+inline entity*
+GetEntity(game_state* gameState, u32 index)
+{
+    entity* entity = 0;
+    if ((index > 0) && (index < ArrayCount(gameState->entities)))
+    {
+	entity = &gameState->entities[index];
+    }
+    return(entity);
+}
+
 internal u32
 AddEntity(game_state* gameState)
 {
@@ -73,6 +84,167 @@ AddEntity(game_state* gameState)
     Assert(gameState->entityCount < ArrayCount(gameState->entities));
     entity* result = &gameState->entities[entityIndex];
     return(entityIndex);
+}
+
+internal void
+InitializePlayer(game_state* gameState, u32 entityIndex)
+{
+    entity* entity = GetEntity(gameState, entityIndex);
+    entity->exists = true;
+    entity->p.absTileX = 1;
+    entity->p.absTileY = 3;
+    entity->p.offset.x = 0.0f;
+    entity->p.offset.y = 0.0f;
+    entity->height = 0.5f;
+    entity->width = 1.0f;
+
+    if (!GetEntity(gameState, gameState->cameraFollowingEntityIndex))
+    {
+	gameState->cameraFollowingEntityIndex = entityIndex;
+    }
+}
+
+internal bool32
+TestWall(r32 wallX, r32 relX, r32 relY, r32 playerDeltaX, r32 playerDeltaY, r32* tMin,
+	 r32 minY, r32 maxY)
+{
+    bool32 hit = false;
+    r32 epsilon = 0.0001f;
+
+    if (playerDeltaX != 0.0f)
+    {
+	r32 tResult = (wallX - relX) / playerDeltaX;
+	r32 y = relY + tResult * playerDeltaY;
+	if ((tResult >= 0.0f) && (*tMin > tResult))
+	{
+	    if ((y >= minY) && (y <= maxY))
+	    {
+		*tMin = Maximum(0.0f, tResult - epsilon);
+		hit = true;
+	    }
+	}
+    }
+    return(hit);
+}
+
+internal void
+MovePlayer(game_state* gameState, entity* entity, r32 dt, v2 ddP)
+{
+    tile_map* tileMap = gameState->world->tileMap;
+
+    r32 ddPLength = LengthSq(ddP);
+    if (ddPLength > 1.0f)
+    {
+	ddP *= 1.0f / SquareRoot(ddPLength);
+    }
+
+    r32 playerSpeed = 50.0f;
+    ddP *= playerSpeed;
+
+    ddP += -7.0f*entity->dP;
+    tile_map_position oldPlayerP = entity->p;
+
+    v2 playerDelta = (0.5f * ddP * Square(dt) + entity->dP*dt);
+    entity->dP = ddP * dt + entity->dP;
+
+    tile_map_position newPlayerP = Offset(tileMap, oldPlayerP, playerDelta);
+
+    u32 minTileX = Minimum(oldPlayerP.absTileX, newPlayerP.absTileX);
+    u32 minTileY = Minimum(oldPlayerP.absTileY, newPlayerP.absTileY);
+    u32 maxTileX = Maximum(oldPlayerP.absTileX, newPlayerP.absTileX);
+    u32 maxTileY = Maximum(oldPlayerP.absTileY, newPlayerP.absTileY);
+
+    u32 entityTileWidth = CeilReal32ToInt32(entity->width / tileMap->tileSideInMeters);
+    u32 entityTileHeight = CeilReal32ToInt32(entity->height / tileMap->tileSideInMeters);
+
+    minTileX -= entityTileWidth;
+    minTileY -= entityTileHeight;
+    maxTileX += entityTileWidth;
+    maxTileY += entityTileHeight;
+
+    u32 absTileZ = entity->p.absTileZ;
+
+    r32 tRemaining = 1.0f;
+    r32 tMin = 1.0f;
+    for (u32 iteration = 0; (iteration < 4) && (tRemaining > 0.0f); ++iteration)
+    {
+	tMin = 1.0f;
+	v2 wallNormal = {};
+
+	Assert((maxTileX - minTileX) < 32);
+	Assert((maxTileY - minTileY) < 32);
+
+	for (u32 absTileY = minTileY; absTileY <= maxTileY; ++absTileY)
+	{
+	    for (u32 absTileX = minTileX; absTileX <= maxTileX; ++absTileX)
+	    {
+		tile_map_position testTileP = CenteredTilePoint(absTileX, absTileY, absTileZ);
+		u32 tileValue = GetTileValue(tileMap, testTileP);
+
+		if (!IsTileValueEmpty(tileValue))
+		{
+		    r32 diameterW = tileMap->tileSideInMeters + entity->width;
+		    r32 diameterH = tileMap->tileSideInMeters + entity->height;
+		    v2 minCorner = -0.5f*v2{diameterW, diameterH};
+		    v2 maxCorner = 0.5f*v2{diameterW, diameterH};
+
+		    tile_map_difference relOldPlayerP = Subtract(tileMap, &entity->p, &testTileP);
+		    v2 rel = relOldPlayerP.dXY;
+		    if (TestWall(minCorner.x, rel.x, rel.y, playerDelta.x, playerDelta.y,
+				 &tMin, minCorner.y, maxCorner.y))
+		    {
+			wallNormal = v2{-1, 0};
+		    }
+		    if (TestWall(maxCorner.x, rel.x, rel.y, playerDelta.x, playerDelta.y,
+				 &tMin, minCorner.y, maxCorner.y))
+		    {
+			wallNormal = v2{1, 0};
+		    }
+		    if (TestWall(minCorner.y, rel.y, rel.x, playerDelta.y, playerDelta.x,
+				 &tMin, minCorner.x, maxCorner.x))
+		    {
+			wallNormal = v2{0, -1};
+		    }
+		    if (TestWall(maxCorner.y, rel.y, rel.x, playerDelta.y, playerDelta.x,
+				 &tMin, minCorner.x, maxCorner.x))
+		    {
+			wallNormal = v2{0, 1};
+		    }		    
+		}
+	    }
+	}
+	entity->p = Offset(tileMap, entity->p, tMin*playerDelta);
+	entity->dP = entity->dP - 1*Inner(entity->dP, wallNormal)*wallNormal;
+	playerDelta = playerDelta - 1 * Inner(playerDelta, wallNormal)*wallNormal;
+	tRemaining -= tMin;
+    }
+
+    if ((entity->dP.x == 0) && (entity->dP.y == 0))
+    {
+	
+    }
+    else if (AbsoluteValue(entity->dP.x) > AbsoluteValue(entity->dP.y))
+    {
+	if (entity->dP.x > 0)
+	{
+	    entity->facingDirection = 0;
+	}
+	else
+	{
+	    entity->facingDirection = 2;
+	}
+    }
+    else
+    {
+	if (entity->dP.x > 0)
+	{
+	    entity->facingDirection = 1;
+	}
+	else
+	{
+	    entity->facingDirection = 3;
+	}
+    }
 }
 
 extern "C" GAME_GET_SOUND_DATA(GameGetSoundData)
@@ -95,6 +267,8 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     if (!memory->isInitialized)
     {
 
+	AddEntity(gameState);
+	
 	gameState->cameraP.absTileX = 17/2;
 	gameState->cameraP.absTileY = 9/2;
 	
@@ -144,6 +318,10 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    u32 absTileY = screenY * tilesPerHeight + tileY;
 
 		    //TODO: SetTileValue here
+		    if (tileY <= 1)
+		    {
+			tileValue = 2;
+		    }
 		    SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, tileValue);
 		    
 		}
@@ -168,37 +346,47 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     {
 	game_controller_input* controller = GetController(input, controllerIndex);
 
-	if (controller->isAnalog)
+	entity* controllingEntity = GetEntity(gameState, gameState->playerIndexForController[controllerIndex]);
+	if (controllingEntity)
 	{
+	    v2 ddP = {};
+	    if (controller->isAnalog)
+	    {
 
+	    }
+	    else
+	    {
+	    
+		r32 dPlayerX = 0.0f;
+		r32 dPlayerY = 0.0f;
+
+		if (controller->moveUp.endedDown)
+		{
+		    ddP.y = 1.0f;
+		}
+		if (controller->moveDown.endedDown)
+		{
+		    ddP.y = -1.0f;
+		}
+		if (controller->moveLeft.endedDown)
+		{
+		    ddP.x = -1.0f;
+		}
+		if (controller->moveRight.endedDown)
+		{
+		    ddP.x = 1.0f;
+		}
+		MovePlayer(gameState, controllingEntity, input->dTime, ddP);
+	    }
 	}
 	else
 	{
-	    r32 dPlayerX = 0.0f;
-	    r32 dPlayerY = 0.0f;
-
-	    if (controller->moveUp.endedDown)
+	    if (controller->start.endedDown)
 	    {
-		dPlayerY = -1.0f;
+		u32 entityIndex = AddEntity(gameState);
+		InitializePlayer(gameState, entityIndex);
+		gameState->playerIndexForController[controllerIndex] = entityIndex;
 	    }
-	    if (controller->moveDown.endedDown)
-	    {
-		dPlayerY = 1.0f;
-	    }
-	    if (controller->moveLeft.endedDown)
-	    {
-		dPlayerX = -1.0f;
-	    }
-	    if (controller->moveRight.endedDown)
-	    {
-		dPlayerX = 1.0f;
-	    }
-
-	    dPlayerX *= 128.0f;
-	    dPlayerY *= 128.0f;
-
-	    gameState->playerX += input->dTime * dPlayerX;
-	    gameState->playerY += input->dTime * dPlayerY;	    
 	}
     }
 
@@ -282,14 +470,32 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     
 
     //draw our player
-    r32 playerR = 1.0f;
-    r32 playerG = 1.0f;
-    r32 playerB = 0.0f;
-
     r32 playerWidth = 0.75f*(r32)tileWidth;
     r32 playerHeight = (r32)tileHeight;
 
     r32 playerTop = gameState->playerY - playerHeight;
     r32 playerLeft = gameState->playerX - 0.5f * playerWidth;
+
+    entity* entity = gameState->entities;
+    for (u32 entityIndex = 0; entityIndex < gameState->entityCount; ++entityIndex, ++entity)
+    {
+	if (entity->exists)
+	{
+	    tile_map_difference diff = Subtract(tileMap, &entity->p, &gameState->cameraP);
+
+	    r32 playerR = 1.0f;
+	    r32 playerG = 1.0f;
+	    r32 playerB = 0.0f;
+
+	    r32 playerGroundPointX = screenCenterX + metersToPixels * diff.dXY.x;
+	    r32 playerGroundPointY = screenCenterY - metersToPixels * diff.dXY.y;
+
+	    v2 playerLeftTop = {playerGroundPointX - 0.5f * metersToPixels * entity->width,
+		playerGroundPointY - 0.5f * metersToPixels * entity->height};
+	    v2 entityWidthHeight = {entity->width, entity->height};
+	    DrawRectangle(buffer, playerLeftTop, playerLeftTop + metersToPixels * entityWidthHeight,
+			  playerR, playerG, playerB);
+	}
+    }
 
 }

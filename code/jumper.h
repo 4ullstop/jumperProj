@@ -22,6 +22,9 @@
 #define Gigabytes(value) (Megabytes(value) * 1024LL)
 #define Terabytes(value) (Gigabytes(value) * 1024LL)
 
+#define Minimum(a, b) ((a < b) ? (a) : (b))
+#define Maximum(a, b) ((a > b) ? (a) : (b))
+
 typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
@@ -190,7 +193,7 @@ struct game_state
     r32 playerX;
     r32 playerY;
 
-    u32 cameraFollowingIndex;
+    u32 cameraFollowingEntityIndex;
     tile_map_position cameraP;
 
     memory_arena worldArena;
