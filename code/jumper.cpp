@@ -145,6 +145,7 @@ MovePlayer(game_state* gameState, entity* entity, r32 dt, v2 ddP)
     tile_map_position oldPlayerP = entity->p;
 
     v2 playerDelta = (0.5f * ddP * Square(dt) + entity->dP*dt);
+    entity->dP.y =+ dt * (-9.81f * tileMap->metersToPixels);
     entity->dP = ddP * dt + entity->dP;
 
     tile_map_position newPlayerP = Offset(tileMap, oldPlayerP, playerDelta);
@@ -339,7 +340,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
     i32 tileSideInPixels = 60;
     r32 metersToPixels = tileSideInPixels / tileMap->tileSideInMeters;
-
+    tileMap->metersToPixels = metersToPixels;
     
     
     for (int controllerIndex = 0; controllerIndex < ArrayCount(input->controllers); ++controllerIndex)

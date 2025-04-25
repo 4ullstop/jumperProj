@@ -1,6 +1,6 @@
  jumper
 
- Timestamp is 680ae063 (Thu Apr 24 21:07:47 2025)
+ Timestamp is 680af0c3 (Thu Apr 24 22:17:39 2025)
 
  Preferred load address is 0000000180000000
 
@@ -2777,8 +2777,8 @@
  0001:000daeb3       RtlUnwind                  00000001800dbeb3 f   kernel32:KERNEL32.dll
  0001:000daf00       ?PushSize_@@YAPEAXPEAUmemory_arena@@_K@Z 00000001800dbf00 f   jumper.obj
  0001:000db290       ?Subtract@@YA?AUtile_map_difference@@PEAUtile_map@@PEAUtile_map_position@@1@Z 00000001800dc290 f   jumper.obj
- 0001:000dc420       GameGetSoundData           00000001800dd420 f   jumper.obj
- 0001:000dc460       GameUpdateAndRender        00000001800dd460 f   jumper.obj
+ 0001:000dc450       GameGetSoundData           00000001800dd450 f   jumper.obj
+ 0001:000dc490       GameUpdateAndRender        00000001800dd490 f   jumper.obj
  0001:000df4f0       _guard_dispatch_icall_nop  00000001800e04f0 f   LIBCMTD:guard_dispatch.obj
  0001:000df510       _guard_xfg_dispatch_icall_nop 00000001800e0510 f   LIBCMTD:guard_xfg_dispatch.obj
  0001:000e0550       memcpy_repmovs             00000001800e1550 f   libvcruntimed:memcpy.obj
@@ -2822,10 +2822,11 @@
  0002:00000c30       _pDefaultRawDllMain        00000001800e6c30     LIBCMTD:dll_dllmain.obj
  0002:00000c30       _pRawDllMain               00000001800e6c30     LIBCMTD:dll_dllmain.obj
  0002:00000c38       __real@c0e00000            00000001800e6c38     jumper.obj
- 0002:00000c3c       __real@c1f00000            00000001800e6c3c     jumper.obj
+ 0002:00000c3c       __real@c11cf5c3            00000001800e6c3c     jumper.obj
  0002:00000c50       __xmm@7fffffffffffffff7fffffffffffffff 00000001800e6c50     jumper.obj
  0002:00000c60       ??_C@_0EC@CDJPIOJK@D?3?2a?2_work?21?2s?2src?2vctools?2crt?2@ 00000001800e6c60     libvcruntimed:std_type_info.obj
  0002:00000ca4       ??_C@_05KGFAIMPG@sqrtf@    00000001800e6ca4     libucrtd:sqrtf.obj
+ 0002:00000cac       __real@c1f00000            00000001800e6cac     jumper.obj
  0002:00000cb0       _pDestructExceptionObject  00000001800e6cb0     libvcruntimed:ehhelpers.obj
  0002:00001540       ??_C@_08EHJDFFNH@__based?$CI@ 00000001800e7540     libvcruntimed:undname.obj
  0002:00001550       ??_C@_07KOLFKCDI@__cdecl@  00000001800e7550     libvcruntimed:undname.obj

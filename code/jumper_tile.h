@@ -43,6 +43,8 @@ struct tile_map
     u32 tileChunkCountZ;
 
     tile_chunk* tileChunks;
+
+    r32 metersToPixels;
 };
 
 #define JUMPER_TILE_H
