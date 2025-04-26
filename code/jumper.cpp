@@ -97,7 +97,7 @@ InitializePlayer(game_state* gameState, u32 entityIndex)
     entity->p.offset.y = 0.0f;
     entity->height = 0.5f;
     entity->width = 1.0f;
-
+    entity->canJump = true;
     if (!GetEntity(gameState, gameState->cameraFollowingEntityIndex))
     {
 	gameState->cameraFollowingEntityIndex = entityIndex;
@@ -141,11 +141,13 @@ MovePlayer(game_state* gameState, entity* entity, r32 dt, v2 ddP)
     r32 playerSpeed = 50.0f;
     ddP *= playerSpeed;
 
-    ddP += -7.0f*entity->dP;
+    
+    ddP += IsEntityInAir(entity) ? -2.0f * entity->dP : -7.0f*entity->dP;
     tile_map_position oldPlayerP = entity->p;
 
     v2 playerDelta = (0.5f * ddP * Square(dt) + entity->dP*dt);
-    entity->dP.y =+ dt * (-9.81f * tileMap->metersToPixels);
+    entity->dP.y += dt * (-9.81f * tileMap->metersToPixels);
+
     entity->dP = ddP * dt + entity->dP;
 
     tile_map_position newPlayerP = Offset(tileMap, oldPlayerP, playerDelta);
@@ -250,11 +252,13 @@ MovePlayer(game_state* gameState, entity* entity, r32 dt, v2 ddP)
 
 extern "C" GAME_GET_SOUND_DATA(GameGetSoundData)
 {
+#if 0
     if (!soundInfo->bufferFilled)
     {
 	FillSinWaveSoundBuffer(soundInfo);
 	soundInfo->bufferFilled = true;
     }
+#endif    
 }
 
 extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
@@ -308,8 +312,10 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 //initializing our tilemap
 	//TODO: Make this all read from a map file you create
+	bool32 isA = true;
 	for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
 	{
+
 	    for (u32 tileY = 0; tileY < tilesPerHeight; ++tileY)
 	    {
 		for (u32 tileX = 0; tileX < tilesPerWidth; ++tileX)
@@ -328,7 +334,17 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		}
 	    }
 	    //set it so we only have chunks going up atm, just to test things out
-	    screenY++;
+	    if (isA)
+	    {
+		screenX++;
+		isA = false;
+	    }
+	    else
+	    {
+		screenY++;
+		isA = true;
+	    }
+
 	}
 
 	memory->isInitialized = true;
@@ -338,7 +354,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     world* world = gameState->world;
     tile_map* tileMap = world->tileMap;
 
-    i32 tileSideInPixels = 60;
+    i32 tileSideInPixels = 30;
     r32 metersToPixels = tileSideInPixels / tileMap->tileSideInMeters;
     tileMap->metersToPixels = metersToPixels;
     
@@ -361,22 +377,92 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		r32 dPlayerX = 0.0f;
 		r32 dPlayerY = 0.0f;
 
+#if 0
+		//basic jump code, that doesn't have any other considerations besides holding a button
+		if (controller->actionDown.endedDown)
+		{
+		    
+		    if (!(controllingEntity->dP.y < 0.0f) && !(controllingEntity->dP.y > 0.0f))
+		    {
+			if (controllingEntity->canJump)
+			{
+			    controllingEntity->dP.y += 100.0f;
+			    controllingEntity->canJump = false;
+			}
+		    }
+		}
+		else
+		{
+		    controllingEntity->canJump = true;
+		}
+#endif
+
+		
+		bool32 movementDetected = false;
+		bool32 jumpInputDetected = false;
 		if (controller->moveUp.endedDown)
 		{
 		    ddP.y = 1.0f;
-		}
-		if (controller->moveDown.endedDown)
-		{
-		    ddP.y = -1.0f;
+		    movementDetected = true;
 		}
 		if (controller->moveLeft.endedDown)
 		{
 		    ddP.x = -1.0f;
+		    movementDetected = true;		    
 		}
 		if (controller->moveRight.endedDown)
 		{
 		    ddP.x = 1.0f;
+		    movementDetected = true;		    
 		}
+		if (controller->moveDown.endedDown)
+		{
+		    //Where we implement the ability to jump
+		    if (controller->actionDown.endedDown)
+		    {
+			if (controllingEntity->dP.y == 0.0f)
+			{
+			    if (controllingEntity->canJump)
+			    {
+				if (ddP.x != 0)
+				{
+				    r32 xVel = 10.0f;
+				    if (ddP.x > 0.0f)
+				    {
+					controllingEntity->dP.x +=
+					    ((r32)controllingEntity->framesHeld * 100.0f) / 100.0f;
+				    }
+				    else
+				    {
+					controllingEntity->dP.x -=
+					    ((r32)controllingEntity->framesHeld * 100.0f) / 100.f;
+				    }
+				}
+				controllingEntity->dP.y += ((r32)controllingEntity->framesHeld * 100.0f) / 100.0f;
+				controllingEntity->canJump = false;
+			    }
+			}
+		    }
+		    else
+		    {
+			controllingEntity->canJump = true;
+			ddP.x = 0.0f;			
+		    }
+		    //currently the jump is frame rate dependent, meaning the higher the frames,
+		    //the higher you can jump, you're gonna wanna fix this at some point but it works for now
+		    if (controllingEntity->framesHeld == 180)
+		    {
+			//we can jump now
+			controllingEntity->framesHeld = 0;
+			
+		    }
+		    controllingEntity->framesHeld++;		    
+		}
+		else
+		{
+		    controllingEntity->framesHeld = 0;
+		}
+
 		MovePlayer(gameState, controllingEntity, input->dTime, ddP);
 	    }
 	}

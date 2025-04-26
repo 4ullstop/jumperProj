@@ -12,7 +12,7 @@ global_variable bool32 running;
 global_variable win32_offscreen_buffer globalBackBuffer;
 global_variable bool32 pause;
 global_variable i64 perfCountFrequency;
-
+global_variable WINDOWPLACEMENT windowPosition = {sizeof(windowPosition)};
 
 #define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex, XINPUT_STATE* pState)
 typedef X_INPUT_GET_STATE(x_input_get_state);
@@ -386,13 +386,14 @@ LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
 }
 
 internal void
-Win32ProcessKeyboardMessage(game_button_state* newState, bool32 isDown)
+Win32ProcessKeyboardMessage(game_button_state* newState, bool32 isDown, bool32 wasDown)
 {
     if (newState->endedDown != isDown)
     {
 	newState->endedDown = isDown;
 	++newState->halfTransitionCount;
     }
+    newState->wasDown = wasDown;
 }
 
 internal void
@@ -481,6 +482,34 @@ Win32PlaybackInput(win32_state* win32State, game_input* newInput)
     }
 }
 
+internal void
+ToggleFullscreen(HWND hwnd)
+{
+    DWORD dwStyle = GetWindowLong(hwnd, GWL_STYLE);
+    if (dwStyle & WS_OVERLAPPEDWINDOW)
+    {
+	MONITORINFO mi = {sizeof(mi)};
+	if (GetWindowPlacement(hwnd, &windowPosition) &&
+	    GetMonitorInfo(MonitorFromWindow(hwnd, MONITOR_DEFAULTTOPRIMARY),
+			   &mi))
+	{
+	    SetWindowLong(hwnd, GWL_STYLE, dwStyle & ~WS_OVERLAPPEDWINDOW);
+	    SetWindowPos(hwnd, HWND_TOP,
+			  mi.rcMonitor.left, mi.rcMonitor.top,
+			  mi.rcMonitor.right - mi.rcMonitor.left,
+			  mi.rcMonitor.bottom - mi.rcMonitor.top,
+			  SWP_NOOWNERZORDER|SWP_FRAMECHANGED);
+	}
+    }
+    else
+    {
+	SetWindowLong(hwnd, GWL_STYLE, dwStyle|WS_OVERLAPPEDWINDOW);
+	SetWindowPlacement(hwnd, &windowPosition);
+	SetWindowPos(hwnd, 0, 0, 0, 0, 0,
+		     SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|
+		     SWP_NOOWNERZORDER|SWP_FRAMECHANGED);
+    }    
+}
 
 internal void
 Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyboardController)
@@ -511,39 +540,39 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 	    {
 		if (VKCode == 'W')
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->moveUp, isDown);
+		    Win32ProcessKeyboardMessage(&keyboardController->moveUp, isDown, wasDown);
 		}
 		else if (VKCode == 'A')
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->moveLeft, isDown);
+		    Win32ProcessKeyboardMessage(&keyboardController->moveLeft, isDown, wasDown);
 		}
 		else if (VKCode == 'S')
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->moveDown, isDown);
+		    Win32ProcessKeyboardMessage(&keyboardController->moveDown, isDown, wasDown);
 		}
 		else if (VKCode == 'D')
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->moveRight, isDown);
+		    Win32ProcessKeyboardMessage(&keyboardController->moveRight, isDown, wasDown);
 		}
 		else if (VKCode == 'Q')
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->rightShoulder, isDown);
+		    Win32ProcessKeyboardMessage(&keyboardController->rightShoulder, isDown, wasDown);
 		}
 		else if (VKCode == VK_UP)
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->actionUp, isDown);
+		    Win32ProcessKeyboardMessage(&keyboardController->actionUp, isDown, wasDown);
 		}
 		else if (VKCode == VK_DOWN)
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->actionDown, isDown);
+		    Win32ProcessKeyboardMessage(&keyboardController->actionDown, isDown, wasDown);
 		}
 		else if (VKCode == VK_LEFT)
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->actionLeft, isDown);
+		    Win32ProcessKeyboardMessage(&keyboardController->actionLeft, isDown, wasDown);
 		}
 		else if (VKCode == VK_RIGHT)
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->actionRight, isDown);
+		    Win32ProcessKeyboardMessage(&keyboardController->actionRight, isDown, wasDown);
 		}
 		else if (VKCode == VK_ESCAPE)
 		{
@@ -551,7 +580,11 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 		}
 		else if (VKCode == VK_SPACE)
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->start, isDown);
+		    Win32ProcessKeyboardMessage(&keyboardController->actionDown, isDown, wasDown);
+		}
+		else if (VKCode == VK_SHIFT)
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->start, isDown, wasDown);
 		}
 #if JUMPER_INTERNAL
 		else if (VKCode == 'P')
@@ -591,8 +624,17 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 		    {
 			running = false;
 		    }
+
+		    if ((VKCode == VK_RETURN) && altKeyWasDown)
+		    {
+			if (msg.hwnd)
+			{
+			    ToggleFullscreen(msg.hwnd);
+			}
+		    }
 		}
 	    }
+
 	} break;
 	default:
 	{

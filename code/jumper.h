@@ -69,6 +69,7 @@ struct game_button_state
 {
     int halfTransitionCount;
     bool32 endedDown;
+    bool32 wasDown;
 };
 
 struct game_controller_input
@@ -79,6 +80,8 @@ struct game_controller_input
     r32 stickAverageX;
     r32 stickAverageY;
 
+    bool32 started;
+    
     union
     {
 	game_button_state buttons[12];
@@ -100,9 +103,13 @@ struct game_controller_input
 	    game_button_state back;
 	    game_button_state start;
 
+
 	    game_button_state terminator;
 	};
     };
+
+
+
 };
 
 struct game_input
@@ -179,11 +186,23 @@ struct world
 struct entity
 {
     bool32 exists;
+
     tile_map_position p;
     u32 facingDirection;
     v2 dP;
     r32 width, height;
+
+    bool32 canJump;
+    i32 framesHeld;
+
+    bool32 isInAir;
 };
+
+inline bool32 IsEntityInAir(entity* entity)
+{
+    bool32 result = entity->dP.y > 0.0f;
+    return(result);
+}
 
 struct game_state
 {
@@ -193,6 +212,8 @@ struct game_state
     r32 playerX;
     r32 playerY;
 
+    bool32 started;
+    
     u32 cameraFollowingEntityIndex;
     tile_map_position cameraP;
 
