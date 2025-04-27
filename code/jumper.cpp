@@ -91,7 +91,7 @@ InitializePlayer(game_state* gameState, u32 entityIndex)
 {
     entity* entity = GetEntity(gameState, entityIndex);
     entity->exists = true;
-    entity->p.absTileX = 1;
+    entity->p.absTileX = 17/2;
     entity->p.absTileY = 3;
     entity->p.offset.x = 0.0f;
     entity->p.offset.y = 0.0f;
@@ -325,10 +325,12 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    u32 absTileY = screenY * tilesPerHeight + tileY;
 
 		    //TODO: SetTileValue here
+		    
 		    if (tileY <= 1)
 		    {
 			tileValue = 2;
 		    }
+
 		    SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, tileValue);
 		    
 		}
@@ -537,11 +539,6 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    gray = 0.25f;
 		}
 
-		if ((column == gameState->cameraP.absTileX) && (row == gameState->cameraP.absTileY))
-		{
-		    gray = 0.0f;
-		}
-
 		v2 tileSide = {0.5f * tileSideInPixels, 0.5f * tileSideInPixels};
 		v2 cen = {screenCenterX - metersToPixels * gameState->cameraP.offset.x +
 		    ((r32)relColumn) * tileSideInPixels,
@@ -555,7 +552,31 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	}
     }
     
+    entity* cameraFollowingEntity = GetEntity(gameState, gameState->cameraFollowingEntityIndex);
+    if (cameraFollowingEntity)
+    {
+	gameState->cameraP.absTileZ = cameraFollowingEntity->p.absTileZ;
 
+	u32 heightFromPlayerHead = 10;
+	tile_map_difference diff = Subtract(tileMap, &cameraFollowingEntity->p, &gameState->cameraP);
+	if (diff.dXY.x > (9.0f*tileMap->tileSideInMeters))
+	{
+	    gameState->cameraP.absTileX += 17;
+	}
+	if (diff.dXY.x < -(9.0f*tileMap->tileSideInMeters))
+	{
+	    gameState->cameraP.absTileX -= 17;
+	}
+	if (diff.dXY.y > (5.0f*tileMap->tileSideInMeters))
+	{
+	    gameState->cameraP.absTileY += heightFromPlayerHead;
+	}
+	if (diff.dXY.y < -(5.0f*tileMap->tileSideInMeters))
+	{
+	    gameState->cameraP.absTileY -= heightFromPlayerHead;
+	}
+    }
+    
     //draw our player
     r32 playerWidth = 0.75f*(r32)tileWidth;
     r32 playerHeight = (r32)tileHeight;

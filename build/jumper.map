@@ -1,6 +1,6 @@
  jumper
 
- Timestamp is 680d7a6b (Sat Apr 26 20:29:31 2025)
+ Timestamp is 680d934a (Sat Apr 26 22:15:38 2025)
 
  Preferred load address is 0000000180000000
 
@@ -2806,16 +2806,18 @@
  0002:00000be0       __real@00000000            00000001800e6be0     jumper.obj
  0002:00000be4       __real@38d1b717            00000001800e6be4     jumper.obj
  0002:00000be8       __real@3e800000            00000001800e6be8     jumper.obj
- 0002:00000bec       __real@41200000            00000001800e6bec     jumper.obj
- 0002:00000bf0       __real@c0000000            00000001800e6bf0     jumper.obj
- 0002:00000bf4       __real@c11cf5c3            00000001800e6bf4     jumper.obj
- 0002:00000bf8       __real@42700000            00000001800e6bf8     jumper.obj
- 0002:00000bfc       __real@42a00000            00000001800e6bfc     jumper.obj
- 0002:00000c00       __real@c1c80000            00000001800e6c00     jumper.obj
- 0002:00000c04       __real@c1f00000            00000001800e6c04     jumper.obj
- 0002:00000c08       __real@42b40000            00000001800e6c08     jumper.obj
- 0002:00000c0c       __real@42c80000            00000001800e6c0c     jumper.obj
- 0002:00000c18       __real@437f0000            00000001800e6c18     jumper.obj
+ 0002:00000bec       __real@40a00000            00000001800e6bec     jumper.obj
+ 0002:00000bf0       __real@bf00068e            00000001800e6bf0     jumper.obj
+ 0002:00000bf4       __real@bf800000            00000001800e6bf4     jumper.obj
+ 0002:00000bf8       __real@41100000            00000001800e6bf8     jumper.obj
+ 0002:00000bfc       __real@41200000            00000001800e6bfc     jumper.obj
+ 0002:00000c00       __real@c0000000            00000001800e6c00     jumper.obj
+ 0002:00000c04       __real@c11cf5c3            00000001800e6c04     jumper.obj
+ 0002:00000c08       __real@42700000            00000001800e6c08     jumper.obj
+ 0002:00000c0c       __real@42a00000            00000001800e6c0c     jumper.obj
+ 0002:00000c10       __real@c1c80000            00000001800e6c10     jumper.obj
+ 0002:00000c14       __real@c1f00000            00000001800e6c14     jumper.obj
+ 0002:00000c18       __real@42b40000            00000001800e6c18     jumper.obj
  0002:00000c1c       __real@3f000000            00000001800e6c1c     jumper.obj
  0002:00000c20       __real@3f0000a8            00000001800e6c20     jumper.obj
  0002:00000c24       __real@3f400000            00000001800e6c24     jumper.obj
@@ -2823,13 +2825,14 @@
  0002:00000c2c       __real@3fb33333            00000001800e6c2c     jumper.obj
  0002:00000c30       _pDefaultRawDllMain        00000001800e6c30     LIBCMTD:dll_dllmain.obj
  0002:00000c30       _pRawDllMain               00000001800e6c30     LIBCMTD:dll_dllmain.obj
- 0002:00000c38       __real@bf000000            00000001800e6c38     jumper.obj
- 0002:00000c3c       __real@bf00068e            00000001800e6c3c     jumper.obj
+ 0002:00000c38       __real@42c80000            00000001800e6c38     jumper.obj
+ 0002:00000c3c       __real@437f0000            00000001800e6c3c     jumper.obj
  0002:00000c50       __xmm@7fffffffffffffff7fffffffffffffff 00000001800e6c50     jumper.obj
  0002:00000c60       ??_C@_0EC@CDJPIOJK@D?3?2a?2_work?21?2s?2src?2vctools?2crt?2@ 00000001800e6c60     libvcruntimed:std_type_info.obj
  0002:00000ca4       ??_C@_05KGFAIMPG@sqrtf@    00000001800e6ca4     libucrtd:sqrtf.obj
- 0002:00000cac       __real@bf800000            00000001800e6cac     jumper.obj
+ 0002:00000cac       __real@bf000000            00000001800e6cac     jumper.obj
  0002:00000cb0       _pDestructExceptionObject  00000001800e6cb0     libvcruntimed:ehhelpers.obj
+ 0002:000013d0       __xmm@80000000800000008000000080000000 00000001800e73d0     jumper.obj
  0002:00001540       ??_C@_08EHJDFFNH@__based?$CI@ 00000001800e7540     libvcruntimed:undname.obj
  0002:00001550       ??_C@_07KOLFKCDI@__cdecl@  00000001800e7550     libvcruntimed:undname.obj
  0002:00001560       ??_C@_08GHMPAG@__pascal@   00000001800e7560     libvcruntimed:undname.obj
