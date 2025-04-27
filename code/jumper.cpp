@@ -138,11 +138,11 @@ MovePlayer(game_state* gameState, entity* entity, r32 dt, v2 ddP)
 	ddP *= 1.0f / SquareRoot(ddPLength);
     }
 
-    r32 playerSpeed = 50.0f;
+    r32 playerSpeed = 80.0f;
     ddP *= playerSpeed;
 
     
-    ddP += IsEntityInAir(entity) ? -2.0f * entity->dP : -7.0f*entity->dP;
+    ddP += IsEntityInAir(entity) ? -2.0f * entity->dP : -25.0f*entity->dP;
     tile_map_position oldPlayerP = entity->p;
 
     v2 playerDelta = (0.5f * ddP * Square(dt) + entity->dP*dt);
@@ -430,15 +430,15 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 				    if (ddP.x > 0.0f)
 				    {
 					controllingEntity->dP.x +=
-					    ((r32)controllingEntity->framesHeld * 100.0f) / 100.0f;
+					    ((r32)controllingEntity->framesHeld * 90.0f) / 100.0f;
 				    }
 				    else
 				    {
 					controllingEntity->dP.x -=
-					    ((r32)controllingEntity->framesHeld * 100.0f) / 100.f;
+					    ((r32)controllingEntity->framesHeld * 90.0f) / 100.f;
 				    }
 				}
-				controllingEntity->dP.y += ((r32)controllingEntity->framesHeld * 100.0f) / 100.0f;
+				controllingEntity->dP.y += ((r32)controllingEntity->framesHeld * 80.0f) / 100.0f;
 				controllingEntity->canJump = false;
 			    }
 			}
@@ -450,7 +450,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    }
 		    //currently the jump is frame rate dependent, meaning the higher the frames,
 		    //the higher you can jump, you're gonna wanna fix this at some point but it works for now
-		    if (controllingEntity->framesHeld == 180)
+		    if (controllingEntity->framesHeld == 100)
 		    {
 			//we can jump now
 			controllingEntity->framesHeld = 0;

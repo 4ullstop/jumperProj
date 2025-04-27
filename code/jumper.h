@@ -200,7 +200,7 @@ struct entity
 
 inline bool32 IsEntityInAir(entity* entity)
 {
-    bool32 result = entity->dP.y > 0.0f;
+    bool32 result = entity->dP.y != 0.0f;
     return(result);
 }
 
