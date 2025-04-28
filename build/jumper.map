@@ -1,6 +1,6 @@
  jumper
 
- Timestamp is 680f9eed (Mon Apr 28 11:29:49 2025)
+ Timestamp is 680fbca6 (Mon Apr 28 13:36:38 2025)
 
  Preferred load address is 0000000180000000
 
@@ -86,13 +86,13 @@
  0001:000073a0       ?CenteredTilePoint@@YA?AUtile_map_position@@III@Z 00000001800083a0 f i jumper.obj
  0001:00007440       ??Yv2@@QEAAAEAU0@U0@@Z     0000000180008440 f i jumper.obj
  0001:00007490       ?CeilReal32ToInt32@@YAHM@Z 0000000180008490 f i jumper.obj
- 0001:000074c0       ?SquareRoot@@YAMM@Z        00000001800084c0 f i jumper.obj
+ 0001:000074c0       ?Square@@YAMM@Z            00000001800084c0 f i jumper.obj
+ 0001:000074f0       ?SquareRoot@@YAMM@Z        00000001800084f0 f i jumper.obj
  0001:00007520       ?GetEntity@@YAPEAUentity@@PEAUgame_state@@I@Z 0000000180008520 f i jumper.obj
  0001:00007570       ?RoundReal32ToInt32@@YAHM@Z 0000000180008570 f i jumper.obj
  0001:000075e0       ??Xv2@@QEAAAEAU0@M@Z       00000001800085e0 f i jumper.obj
  0001:00007620       ?RoundReal32ToUInt32@@YAIM@Z 0000000180008620 f i jumper.obj
  0001:00007690       ?GetChunkPositionFor@@YA?AUtile_chunk_position@@PEAUtile_map@@III@Z 0000000180008690 f i jumper.obj
- 0001:00007750       ?Square@@YAMM@Z            0000000180008750 f i jumper.obj
  0001:00007780       ??D@YA?AUv2@@U0@M@Z        0000000180008780 f i jumper.obj
  0001:000077e0       __GSHandlerCheck           00000001800087e0 f   LIBCMTD:gshandler.obj
  0001:00007830       __GSHandlerCheckCommon     0000000180008830 f   LIBCMTD:gshandler.obj
@@ -10472,6 +10472,8 @@
  0002:00001300       ?rttiTable@@3QBUStringLiteral@@B 00000001800e7300     libvcruntimed:undname.obj
  0002:00001350       ?IndirectionName@@3QBUStringLiteral@@B 00000001800e7350     libvcruntimed:undname.obj
  0002:000013b0       ?PrefixName@@3QBUStringLiteral@@B 00000001800e73b0     libvcruntimed:undname.obj
+ 0002:000013d0       $SG4880                    00000001800e73d0     jumper.obj
+ 0002:000013e8       $SG4881                    00000001800e73e8     jumper.obj
  0002:00002350       ?result@?1??IsValidIdentChar@@YA_ND@Z@4U<unnamed-type-result>@?1??InitValidIdentChar@@YA@XZ@B 00000001800e8350     libvcruntimed:undname.obj
  0002:000026e0       ?ExceptionTemplate@?1??UnwindNestedFrames@__FrameHandler4@@SAXPEA_KPEAUEHExceptionRecord@@PEAU_CONTEXT@@0PEAXPEAUFuncInfo4@FH4@@HHPEAUHandlerType4@6@PEAU_xDISPATCHER_CONTEXT@@E@Z@4U_EXCEPTION_RECORD@@B 00000001800e86e0     libvcruntimed:risctrnsctrl.obj
  0002:000027a0       ?ExceptionTemplate@?1??UnwindNestedFrames@__FrameHandler3@@SAXPEA_KPEAUEHExceptionRecord@@PEAU_CONTEXT@@0PEAXPEBU_s_FuncInfo@@HHPEBU_s_HandlerType@@PEAU_xDISPATCHER_CONTEXT@@E@Z@4U_EXCEPTION_RECORD@@B 00000001800e87a0     libvcruntimed:risctrnsctrl.obj

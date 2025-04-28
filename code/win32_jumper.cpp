@@ -871,7 +871,10 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    game_memory gameMemory = {};
 	    gameMemory.permanentStorageSize = Megabytes(64);
 	    gameMemory.permanentStorageSize = Gigabytes(1);
-
+	    gameMemory.DEBUGPlatformReadEntireFile = DEBUGPlatformReadEntireFile;
+	    gameMemory.DEBUGPlatformFreeFileMemory = DEBUGPlatformFreeFileMemory;
+	    gameMemory.DEBUGPlatformWriteEntireFile = DEBUGPlatformWriteEntireFile;
+	    
 	    win32State.totalSize = gameMemory.permanentStorageSize + gameMemory.transientStorageSize;
 	    win32State.gameMemoryBlock = VirtualAlloc(baseAddress, (size_t)win32State.totalSize,
 						       MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
@@ -1063,9 +1066,12 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		    {
 			Win32PlaybackInput(&win32State, newInput);
 		    }
+
+		    thread_context thread = {};
+		    
 		    if (game.UpdateAndRender)
 		    {
-			game.UpdateAndRender(&goBuffer, &gameMemory, newInput);
+			game.UpdateAndRender(&thread, &goBuffer, &gameMemory, newInput);
 		    }
 
 		    if (game.GetSoundData)

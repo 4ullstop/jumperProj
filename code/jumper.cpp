@@ -312,6 +312,11 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 //initializing our tilemap
 	//TODO: Make this all read from a map file you create
+
+	//Open the file
+	//Write tile info
+	//Read from the file
+	
 	bool32 isA = true;
 	for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
 	{
@@ -359,12 +364,20 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 #endif	    
 	}
 
+	if (memory->DEBUGPlatformWriteEntireFile(thread, "tilemap_test.map", sizeof(tile_map), world->tileMap))
+	{
+	    debug_read_file_result result = memory->DEBUGPlatformReadEntireFile(thread, "tilemap_test.map");
+	    world->tileMap = (tile_map*)result.contents;
+	}
+	
+
 	memory->isInitialized = true;
     }
 
 
     world* world = gameState->world;
     tile_map* tileMap = world->tileMap;
+    
 
     i32 tileSideInPixels = 30;
     r32 metersToPixels = tileSideInPixels / tileMap->tileSideInMeters;

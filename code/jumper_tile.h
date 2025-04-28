@@ -30,6 +30,8 @@ struct tile_chunk
     u32* tiles;
 };
 
+
+#pragma pack(push, 1)
 struct tile_map
 {
     u32 chunkShift;
@@ -46,6 +48,7 @@ struct tile_map
 
     r32 metersToPixels;
 };
+#pragma pack(pop)
 
 #define JUMPER_TILE_H
 #endif

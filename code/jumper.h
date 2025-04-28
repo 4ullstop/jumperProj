@@ -153,6 +153,10 @@ struct game_memory
 
     u64 transientStorageSize;
     void* transientStorage;
+
+    debug_platform_read_entire_file* DEBUGPlatformReadEntireFile;
+    debug_platform_free_file_memory* DEBUGPlatformFreeFileMemory;
+    debug_platform_write_entire_file* DEBUGPlatformWriteEntireFile;
 };
 
 struct game_sound_info
@@ -167,7 +171,7 @@ inline game_controller_input* GetController(game_input* input, int unsigned cont
     return(result);
 }
 
-#define GAME_UPDATE_AND_RENDER(name) void name(game_offscreen_buffer* buffer, game_memory* memory, game_input* input)
+#define GAME_UPDATE_AND_RENDER(name) void name(thread_context* thread, game_offscreen_buffer* buffer, game_memory* memory, game_input* input)
 typedef GAME_UPDATE_AND_RENDER(game_update_and_render);
 
 #define GAME_GET_SOUND_DATA(name) void name(game_sound_info* soundInfo)
