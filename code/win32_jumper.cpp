@@ -578,7 +578,7 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 		{
 		    running = false;
 		}
-		else if (VKCode == VK_SPACE)
+		else if (VKCode == 'J')
 		{
 		    Win32ProcessKeyboardMessage(&keyboardController->actionDown, isDown, wasDown);
 		}

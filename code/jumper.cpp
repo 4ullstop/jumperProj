@@ -333,7 +333,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 			    tileValue = 2;
 			}
 		    }
-		    if ((tileX == 0) || (tileX == tilesPerWidth - 1))
+		    if ((tileX <= 1) || (tileX == tilesPerWidth - 1) || tileX == tilesPerWidth -2)
 		    {
 			tileValue = 2;
 		    }
@@ -436,21 +436,23 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 			{
 			    if (controllingEntity->canJump)
 			    {
+				r32 dtMult = input->dTime * 60.0f;
 				if (ddP.x != 0)
 				{
 				    r32 xVel = 10.0f;
 				    if (ddP.x > 0.0f)
 				    {
 					controllingEntity->dP.x +=
-					    ((r32)controllingEntity->framesHeld * 90.0f) / 100.0f;
+					    ((r32)controllingEntity->framesHeld * dtMult + 10.0f);
 				    }
 				    else
 				    {
 					controllingEntity->dP.x -=
-					    ((r32)controllingEntity->framesHeld * 90.0f) / 100.f;
+					    ((r32)controllingEntity->framesHeld * dtMult + 10.0f);
 				    }
 				}
-				controllingEntity->dP.y += ((r32)controllingEntity->framesHeld * 80.0f) / 100.0f;
+
+				controllingEntity->dP.y += ((r32)controllingEntity->framesHeld * dtMult);
 				controllingEntity->canJump = false;
 			    }
 			}
