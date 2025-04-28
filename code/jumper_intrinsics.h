@@ -1,6 +1,14 @@
 #if !defined(JUMPER_INTRINSICS_H)
 #include "math.h"
 
+inline u32
+SafeTruncateUInt64(u64 value)
+{
+    Assert(value <= 0xFFFFFFFF);
+    u32 result = (u32)value;
+    return(result);
+}
+
 inline i32
 SignOf(i32 value)
 {

@@ -38,7 +38,93 @@ typedef X_AUDIO2_CREATE(x_audio2_create);
 #define COINITIALIZE(name) HRESULT name(LPVOID pvReserved, DWORD dwCoInit)
 typedef COINITIALIZE(co_initialize);
 
+DEBUG_PLATFORM_FREE_FILE_MEMORY(DEBUGPlatformFreeFileMemory)
+{
+    VirtualFree(memory, 0, MEM_RESERVE);
+}
 
+DEBUG_PLATFORM_READ_ENTIRE_FILE(DEBUGPlatformReadEntireFile)
+{
+    debug_read_file_result result = {};
+    HANDLE fileHandle = CreateFile(filename,
+				   GENERIC_READ,
+				   FILE_SHARE_READ,
+				   0,
+				   OPEN_EXISTING,
+				   0,
+				   0);
+    if (fileHandle != INVALID_HANDLE_VALUE)
+    {
+	LARGE_INTEGER fileSize;
+	if (GetFileSizeEx(fileHandle, &fileSize))
+	{
+	    u32 fileSize32 = SafeTruncateUInt64(fileSize.QuadPart);
+	    result.contents = VirtualAlloc(0, fileSize32, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+	    if (result.contents)
+	    {
+		DWORD bytesRead;
+		if (ReadFile(fileHandle,
+			     result.contents,
+			     fileSize32,
+			     &bytesRead,
+			     0) &&
+		    (fileSize32 == bytesRead))
+		{
+		    result.contentsSize = fileSize32;
+		}
+		else
+		{
+		    DEBUGPlatformFreeFileMemory(thread, result.contents);
+		    result.contents = 0;
+		}
+	    }
+	    else
+	    {
+
+	    }
+	    CloseHandle(fileHandle);
+	}
+	else
+	{
+
+	}
+    }
+    else
+    {
+
+    }
+    return(result);
+}
+
+DEBUG_PLATFORM_WRITE_ENTIRE_FILE(DEBUGPlatformWriteEntireFile)
+{
+    bool32 result = 0;
+    HANDLE fileHandle = CreateFile(filename,
+				   GENERIC_WRITE,
+				   0,
+				   0,
+				   CREATE_ALWAYS,
+				   0,
+				   0);
+    if (fileHandle != INVALID_HANDLE_VALUE)
+    {
+	DWORD bytesWritten;
+	if (WriteFile(fileHandle, memory, memorySize, &bytesWritten, 0))
+	{
+	    result = (bytesWritten == memorySize);
+	}
+	else
+	{
+
+	}
+	CloseHandle(fileHandle);
+    }
+    else
+    {
+	
+    }
+    return(result);
+}
 
 internal void
 CatStrings(size_t sourceACount, char* sourceA,

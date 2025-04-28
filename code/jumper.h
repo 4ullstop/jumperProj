@@ -42,6 +42,29 @@ typedef double r64;
 
 typedef size_t memory_index;
 
+struct thread_context
+{
+    int placeHolder;
+};
+
+#if JUMPER_INTERNAL
+struct debug_read_file_result
+{
+    u32 contentsSize;
+    void* contents;
+};
+
+#define DEBUG_PLATFORM_READ_ENTIRE_FILE(name) debug_read_file_result name(thread_context* thread, char* filename)
+typedef DEBUG_PLATFORM_READ_ENTIRE_FILE(debug_platform_read_entire_file);
+
+#define DEBUG_PLATFORM_FREE_FILE_MEMORY(name) void name(thread_context* thread, void* memory)
+typedef DEBUG_PLATFORM_FREE_FILE_MEMORY(debug_platform_free_file_memory);
+
+#define DEBUG_PLATFORM_WRITE_ENTIRE_FILE(name) bool32 name(thread_context* thread, char* filename, u32 memorySize, void* memory)
+typedef DEBUG_PLATFORM_WRITE_ENTIRE_FILE(debug_platform_write_entire_file);
+
+#endif
+
 #define BITS_PER_SAMPLE 16
 #define SAMPLES_PER_SEC 44100
 #define AUDIO_BUFFER_SIZE_CYCLES 10
