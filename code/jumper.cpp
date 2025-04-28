@@ -316,7 +316,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	//Open the file
 	//Write tile info
 	//Read from the file
-	
+#if 0	
 	bool32 isA = true;
 	for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
 	{
@@ -363,14 +363,16 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    screenY++;
 #endif	    
 	}
-
-	if (memory->DEBUGPlatformWriteEntireFile(thread, "tilemap_test.map", sizeof(tile_map), world->tileMap))
+	world->tileMapItems = *tileMap;
+	if (memory->DEBUGPlatformWriteEntireFile(thread, "tilemap_test.map", sizeof(tile_map), &world->tileMapItems))
 	{
 	    debug_read_file_result result = memory->DEBUGPlatformReadEntireFile(thread, "tilemap_test.map");
 	    world->tileMap = (tile_map*)result.contents;
 	}
+#endif
+	debug_read_file_result result = memory->DEBUGPlatformReadEntireFile(thread, "tilemap_test.map");	
+	world->tileMap = (tile_map*)result.contents;
 	
-
 	memory->isInitialized = true;
     }
 

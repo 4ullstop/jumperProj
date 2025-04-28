@@ -1,6 +1,6 @@
  win32_jumper
 
- Timestamp is 680fbf14 (Mon Apr 28 13:47:00 2025)
+ Timestamp is 680fc6d0 (Mon Apr 28 14:20:00 2025)
 
  Preferred load address is 0000000140000000
 
@@ -10584,35 +10584,35 @@
  0002:00000460       ?pre_cpp_initializer@@3P6AXXZEA 00000001400b0460     LIBCMTD:exe_winmain.obj
  0002:00000478       ?pre_c_initializer@@3P6AHXZEA 00000001400b0478     LIBCMTD:exe_winmain.obj
  0002:00000480       ?post_pgo_initializer@@3P6AHXZEA 00000001400b0480     LIBCMTD:exe_winmain.obj
- 0002:000004f0       $SG88191                   00000001400b04f0     win32_jumper.obj
- 0002:00000508       $SG88192                   00000001400b0508     win32_jumper.obj
- 0002:00000520       $SG88213                   00000001400b0520     win32_jumper.obj
- 0002:00000530       $SG88214                   00000001400b0530     win32_jumper.obj
- 0002:00000540       $SG88216                   00000001400b0540     win32_jumper.obj
- 0002:00000550       $SG88217                   00000001400b0550     win32_jumper.obj
- 0002:00000560       $SG88225                   00000001400b0560     win32_jumper.obj
- 0002:00000590       $SG88228                   00000001400b0590     win32_jumper.obj
- 0002:000005b8       $SG88229                   00000001400b05b8     win32_jumper.obj
- 0002:000005e0       $SG88236                   00000001400b05e0     win32_jumper.obj
- 0002:000005f0       $SG88238                   00000001400b05f0     win32_jumper.obj
- 0002:00000600       $SG88240                   00000001400b0600     win32_jumper.obj
- 0002:00000610       $SG88243                   00000001400b0610     win32_jumper.obj
- 0002:00000620       $SG88244                   00000001400b0620     win32_jumper.obj
- 0002:00000630       $SG88245                   00000001400b0630     win32_jumper.obj
- 0002:00000660       $SG88311                   00000001400b0660     win32_jumper.obj
- 0002:00000678       $SG88313                   00000001400b0678     win32_jumper.obj
- 0002:00000690       $SG88315                   00000001400b0690     win32_jumper.obj
- 0002:000006a8       $SG88317                   00000001400b06a8     win32_jumper.obj
- 0002:000006bc       $SG88334                   00000001400b06bc     win32_jumper.obj
- 0002:000006c4       $SG88335                   00000001400b06c4     win32_jumper.obj
- 0002:000006d0       $SG88336                   00000001400b06d0     win32_jumper.obj
- 0002:000006e8       $SG88576                   00000001400b06e8     win32_jumper.obj
- 0002:000006f8       $SG88577                   00000001400b06f8     win32_jumper.obj
- 0002:00000708       $SG88578                   00000001400b0708     win32_jumper.obj
- 0002:00000718       $SG88579                   00000001400b0718     win32_jumper.obj
- 0002:00000730       $SG88581                   00000001400b0730     win32_jumper.obj
- 0002:00000740       $SG88584                   00000001400b0740     win32_jumper.obj
- 0002:00000750       $SG88606                   00000001400b0750     win32_jumper.obj
+ 0002:000004f0       $SG88192                   00000001400b04f0     win32_jumper.obj
+ 0002:00000508       $SG88193                   00000001400b0508     win32_jumper.obj
+ 0002:00000520       $SG88214                   00000001400b0520     win32_jumper.obj
+ 0002:00000530       $SG88215                   00000001400b0530     win32_jumper.obj
+ 0002:00000540       $SG88217                   00000001400b0540     win32_jumper.obj
+ 0002:00000550       $SG88218                   00000001400b0550     win32_jumper.obj
+ 0002:00000560       $SG88226                   00000001400b0560     win32_jumper.obj
+ 0002:00000590       $SG88229                   00000001400b0590     win32_jumper.obj
+ 0002:000005b8       $SG88230                   00000001400b05b8     win32_jumper.obj
+ 0002:000005e0       $SG88237                   00000001400b05e0     win32_jumper.obj
+ 0002:000005f0       $SG88239                   00000001400b05f0     win32_jumper.obj
+ 0002:00000600       $SG88241                   00000001400b0600     win32_jumper.obj
+ 0002:00000610       $SG88244                   00000001400b0610     win32_jumper.obj
+ 0002:00000620       $SG88245                   00000001400b0620     win32_jumper.obj
+ 0002:00000630       $SG88246                   00000001400b0630     win32_jumper.obj
+ 0002:00000660       $SG88312                   00000001400b0660     win32_jumper.obj
+ 0002:00000678       $SG88314                   00000001400b0678     win32_jumper.obj
+ 0002:00000690       $SG88316                   00000001400b0690     win32_jumper.obj
+ 0002:000006a8       $SG88318                   00000001400b06a8     win32_jumper.obj
+ 0002:000006bc       $SG88335                   00000001400b06bc     win32_jumper.obj
+ 0002:000006c4       $SG88336                   00000001400b06c4     win32_jumper.obj
+ 0002:000006d0       $SG88337                   00000001400b06d0     win32_jumper.obj
+ 0002:000006e8       $SG88577                   00000001400b06e8     win32_jumper.obj
+ 0002:000006f8       $SG88578                   00000001400b06f8     win32_jumper.obj
+ 0002:00000708       $SG88579                   00000001400b0708     win32_jumper.obj
+ 0002:00000718       $SG88580                   00000001400b0718     win32_jumper.obj
+ 0002:00000730       $SG88582                   00000001400b0730     win32_jumper.obj
+ 0002:00000740       $SG88585                   00000001400b0740     win32_jumper.obj
+ 0002:00000750       $SG88607                   00000001400b0750     win32_jumper.obj
  0002:000007a0       GS_ExceptionPointers       00000001400b07a0     LIBCMTD:gs_report.obj
  0002:00000850       ?tokenTable@@3QBUStringLiteral@@B 00000001400b0850     libvcruntimed:undname.obj
  0002:00000960       ?nameTable@@3QBUStringLiteral@@B 00000001400b0960     libvcruntimed:undname.obj

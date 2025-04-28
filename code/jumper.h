@@ -208,6 +208,7 @@ void* PushSize_(memory_arena* arena, memory_index size)
 struct world
 {
     tile_map* tileMap;
+    tile_map tileMapItems;
 };
 
 struct entity
