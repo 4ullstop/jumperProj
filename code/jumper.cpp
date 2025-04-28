@@ -274,8 +274,8 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 	AddEntity(gameState);
 	
-	gameState->cameraP.absTileX = 17/2;
-	gameState->cameraP.absTileY = 9/2;
+	gameState->cameraP.absTileX = 33/2;
+	gameState->cameraP.absTileY = 9;
 	
 	InitializeArena(&gameState->worldArena, memory->permanentStorageSize - sizeof(game_state),
 			(u8*)memory->permanentStorage + sizeof(game_state));
@@ -303,7 +303,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	
 
 	// the number of tiles per chunk
-	u32 tilesPerWidth = 17;
+	u32 tilesPerWidth = 33;
 	u32 tilesPerHeight = 9;
 
 	u32 screenX = 0;
@@ -325,17 +325,25 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    u32 absTileY = screenY * tilesPerHeight + tileY;
 
 		    //TODO: SetTileValue here
-		    
-		    if (tileY <= 1)
+#if 1
+		    if (screenIndex == 0)
+		    {
+			if (tileY <= 1)
+			{
+			    tileValue = 2;
+			}
+		    }
+		    if ((tileX == 0) || (tileX == tilesPerWidth - 1))
 		    {
 			tileValue = 2;
 		    }
-
+#endif		    
 		    SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, tileValue);
 		    
 		}
 	    }
 	    //set it so we only have chunks going up atm, just to test things out
+#if 0 
 	    if (isA)
 	    {
 		screenX++;
@@ -346,7 +354,9 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		screenY++;
 		isA = true;
 	    }
-
+#else
+	    screenY++;
+#endif	    
 	}
 
 	memory->isInitialized = true;
@@ -551,7 +561,9 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    }
 	}
     }
-    
+
+    //The issue with the camera centering stuff is here in the camera following code, will need to figure this out
+#if 0     
     entity* cameraFollowingEntity = GetEntity(gameState, gameState->cameraFollowingEntityIndex);
     if (cameraFollowingEntity)
     {
@@ -559,6 +571,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 	u32 heightFromPlayerHead = 10;
 	tile_map_difference diff = Subtract(tileMap, &cameraFollowingEntity->p, &gameState->cameraP);
+
 	if (diff.dXY.x > (9.0f*tileMap->tileSideInMeters))
 	{
 	    gameState->cameraP.absTileX += 17;
@@ -567,6 +580,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	{
 	    gameState->cameraP.absTileX -= 17;
 	}
+
 	if (diff.dXY.y > (5.0f*tileMap->tileSideInMeters))
 	{
 	    gameState->cameraP.absTileY += heightFromPlayerHead;
@@ -576,7 +590,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    gameState->cameraP.absTileY -= heightFromPlayerHead;
 	}
     }
-    
+#endif	    
     //draw our player
     r32 playerWidth = 0.75f*(r32)tileWidth;
     r32 playerHeight = (r32)tileHeight;
