@@ -269,6 +269,12 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
     game_state* gameState = (game_state*)memory->permanentStorage;
 
+#if JUMPER_INTERNAL    
+    u32 serializedChunks[100][9][33];
+#else
+    u32 serializedChunks = 0;
+#endif
+    
     if (!memory->isInitialized)
     {
 
@@ -316,7 +322,11 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	//Open the file
 	//Write tile info
 	//Read from the file
-#if 0	
+#if 0
+
+	//100 chunks of 9x33 tiles
+
+	debug_open_file_result openedFile = memory->DEBUGPlatformOpenFile("tilemap_test.map");
 	bool32 isA = true;
 	for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
 	{
@@ -330,7 +340,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    u32 absTileY = screenY * tilesPerHeight + tileY;
 
 		    //TODO: SetTileValue here
-#if 1
+
 		    if (screenIndex == 0)
 		    {
 			if (tileY <= 1)
@@ -342,37 +352,56 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    {
 			tileValue = 2;
 		    }
-#endif		    
+
 		    SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, tileValue);
-		    
+
+		    serializedChunks[screenIndex][tileY][tileX] = tileValue;
+		    if (openedFile.fileOpened)
+		    {
+			memory->DEBUGPlatformWriteToFile(&openedFile, &tileValue, sizeof(tileValue));
+		    }
+
 		}
 	    }
 	    //set it so we only have chunks going up atm, just to test things out
-#if 0 
-	    if (isA)
-	    {
-		screenX++;
-		isA = false;
-	    }
-	    else
-	    {
-		screenY++;
-		isA = true;
-	    }
-#else
 	    screenY++;
-#endif	    
 	}
-	world->tileMapItems = *tileMap;
-	if (memory->DEBUGPlatformWriteEntireFile(thread, "tilemap_test.map", sizeof(tile_map), &world->tileMapItems))
+
+	if (openedFile.fileOpened)
 	{
-	    debug_read_file_result result = memory->DEBUGPlatformReadEntireFile(thread, "tilemap_test.map");
-	    world->tileMap = (tile_map*)result.contents;
+	    memory->DEBUGPlatformCloseFile(&openedFile);
+	}
+#endif		
+
+#if 1 	
+	
+
+
+	debug_read_file_result result = memory->DEBUGPlatformReadEntireFile(thread, "tilemap_test.map");
+	if (result.contentsSize == sizeof(serializedChunks))
+	{
+	    u32* tileValue = (u32*)result.contents;
+	    for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
+	    {
+		for (u32 tileY = 0; tileY < tilesPerHeight; ++tileY)
+		{
+		    for (u32 tileX = 0; tileX < tilesPerWidth; ++tileX)
+		    {
+			u32 absTileX = screenX * tilesPerWidth + tileX;
+			u32 absTileY = screenY * tilesPerHeight + tileY;
+
+			SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, *tileValue);
+
+			tileValue++;
+
+		    }
+		}
+		screenY++;
+	    }
+	    
 	}
 #endif
-	debug_read_file_result result = memory->DEBUGPlatformReadEntireFile(thread, "tilemap_test.map");	
-	world->tileMap = (tile_map*)result.contents;
-	
+
 	memory->isInitialized = true;
     }
 

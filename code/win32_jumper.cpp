@@ -126,6 +126,52 @@ DEBUG_PLATFORM_WRITE_ENTIRE_FILE(DEBUGPlatformWriteEntireFile)
     return(result);
 }
 
+DEBUG_PLATFORM_WRITE_TO_FILE(DEBUGPlatformWriteToFile)
+{
+    bool32 result = false;
+    HANDLE fileHandle = (HANDLE)openedFile->handle;
+    if (fileHandle != INVALID_HANDLE_VALUE)
+    {
+
+	DWORD bytesWritten;
+	if (WriteFile(fileHandle, memory, memorySize, &bytesWritten, 0))
+	{
+	    result = (bytesWritten == memorySize);
+	}
+	else
+	{
+
+	}
+    }
+    return(result);
+}
+
+DEBUG_PLATFORM_OPEN_FILE(DEBUGPlatformOpenFile)
+{
+    debug_open_file_result result = {};
+    HANDLE fileHandle = CreateFile(filename,
+				   GENERIC_WRITE,
+				   0,
+				   0,
+				   CREATE_ALWAYS,
+				   0,
+				   0);
+    result.handle = fileHandle;
+    result.fileOpened = fileHandle != INVALID_HANDLE_VALUE;
+    return(result);
+}
+
+DEBUG_PLATFORM_CLOSE_FILE(DEBUGPlatformCloseFile)
+{
+    HANDLE fileHandle = (HANDLE)openedFile->handle;
+    bool32 result = false;
+    if (fileHandle != INVALID_HANDLE_VALUE)
+    {
+	result = CloseHandle(fileHandle);
+    }
+    return(result);
+}
+
 internal void
 CatStrings(size_t sourceACount, char* sourceA,
 	   size_t sourceBCount, char* sourceB,
@@ -874,6 +920,9 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    gameMemory.DEBUGPlatformReadEntireFile = DEBUGPlatformReadEntireFile;
 	    gameMemory.DEBUGPlatformFreeFileMemory = DEBUGPlatformFreeFileMemory;
 	    gameMemory.DEBUGPlatformWriteEntireFile = DEBUGPlatformWriteEntireFile;
+	    gameMemory.DEBUGPlatformOpenFile = DEBUGPlatformOpenFile;
+	    gameMemory.DEBUGPlatformCloseFile = DEBUGPlatformCloseFile;
+	    gameMemory.DEBUGPlatformWriteToFile = DEBUGPlatformWriteToFile;
 	    
 	    win32State.totalSize = gameMemory.permanentStorageSize + gameMemory.transientStorageSize;
 	    win32State.gameMemoryBlock = VirtualAlloc(baseAddress, (size_t)win32State.totalSize,
