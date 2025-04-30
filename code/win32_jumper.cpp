@@ -748,6 +748,14 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 			}
 		    }
 		}
+		if (isDown)
+		{
+		    bool32 altKeyWasDown = ((msg.lParam & (1 << 29)) != 0);
+		    if ((VKCode == 'S') && altKeyWasDown)
+		    {
+			Win32ProcessKeyboardMessage(&keyboardController->save, isDown, wasDown);		
+		    }
+		}
 #endif
 		if (isDown)
 		{
@@ -985,6 +993,14 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		
 		while (running)
 		{
+		    POINT mouseP;
+		    GetCursorPos(&mouseP);
+		    ScreenToClient(window, &mouseP);
+		    newInput->mouseX = mouseP.x;
+		    newInput->mouseY = mouseP.y;
+		    Win32ProcessKeyboardMessage(&newInput->mouseButtons[0],
+						GetKeyState(VK_LBUTTON) & (1 << 15), 0);
+		    
 		    newInput->dTime = targetSecondsPerFrame;
 		    FILETIME newDLLWriteTime = Win32GetLastWriteTime(sourceGameCodeDLLFullPath);
 		    if (CompareFileTime(&newDLLWriteTime, &game.dllLastWriteTime) != 0)

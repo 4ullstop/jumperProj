@@ -354,7 +354,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    }
 
 		    SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, tileValue);
-
+ 
 		    serializedChunks[screenIndex][tileY][tileX] = tileValue;
 		    if (openedFile.fileOpened)
 		    {
@@ -374,32 +374,28 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 #endif		
 
 #if 1 	
-	
-
 
 	debug_read_file_result result = memory->DEBUGPlatformReadEntireFile(thread, "tilemap_test.map");
-	if (result.contentsSize == sizeof(serializedChunks))
+	u32* tileValue = (u32*)result.contents;
+	for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
 	{
-	    u32* tileValue = (u32*)result.contents;
-	    for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
+	    for (u32 tileY = 0; tileY < tilesPerHeight; ++tileY)
 	    {
-		for (u32 tileY = 0; tileY < tilesPerHeight; ++tileY)
+		for (u32 tileX = 0; tileX < tilesPerWidth; ++tileX)
 		{
-		    for (u32 tileX = 0; tileX < tilesPerWidth; ++tileX)
-		    {
-			u32 absTileX = screenX * tilesPerWidth + tileX;
-			u32 absTileY = screenY * tilesPerHeight + tileY;
+		    u32 absTileX = screenX * tilesPerWidth + tileX;
+		    u32 absTileY = screenY * tilesPerHeight + tileY;
 
-			SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, *tileValue);
+		    SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, *tileValue);
 
-			tileValue++;
+		    tileValue++;
 
-		    }
 		}
-		screenY++;
 	    }
-	    
+	    screenY++;
 	}
+	    
+
 #endif
 
 	memory->isInitialized = true;
@@ -452,6 +448,25 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    controllingEntity->canJump = true;
 		}
 #endif
+
+
+		if (controller->save.endedDown)
+		{
+		    
+		}
+
+		if (input->mouseButtons[0].endedDown)
+		{
+		    tile_map_position mousePos = {};
+		    mousePos.absTileX = input->mouseX;
+		    mousePos.absTileY = input->mouseY;
+		    mousePos.absTileZ = 0;
+		    mousePos = RecanonicalizePosition(tileMap, mousePos);
+		    GetTileValue(tileMap, mousePos);
+		    SetTileValue(&gameState->worldArena, tileMap, mousePos.absTileX, mousePos.absTileY,
+				 mousePos.absTileZ, 1);
+		}
+		
 
 		
 		bool32 movementDetected = false;
