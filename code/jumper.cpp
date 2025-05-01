@@ -138,11 +138,11 @@ MovePlayer(game_state* gameState, entity* entity, r32 dt, v2 ddP)
 	ddP *= 1.0f / SquareRoot(ddPLength);
     }
 
-    r32 playerSpeed = 80.0f;
+    r32 playerSpeed = 180.0f;
     ddP *= playerSpeed;
 
     
-    ddP += IsEntityInAir(entity) ? -2.0f * entity->dP : -25.0f*entity->dP;
+    ddP += IsEntityInAir(entity) ? -2.0f * entity->dP : -35.0f*entity->dP;
     tile_map_position oldPlayerP = entity->p;
 
     v2 playerDelta = (0.5f * ddP * Square(dt) + entity->dP*dt);
@@ -461,10 +461,13 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    mousePos.absTileX = input->mouseX;
 		    mousePos.absTileY = input->mouseY;
 		    mousePos.absTileZ = 0;
-		    mousePos = RecanonicalizePosition(tileMap, mousePos);
-		    GetTileValue(tileMap, mousePos);
-		    SetTileValue(&gameState->worldArena, tileMap, mousePos.absTileX, mousePos.absTileY,
-				 mousePos.absTileZ, 1);
+		    //Divide the screen up based on the screen size
+		    //the dimension of the tiles in pixels and the number of tiles per screen
+		    mousePos.absTileX = mousePos.absTileX / tileSideInPixels;
+		    mousePos.absTileY = mousePos.absTileY / tileSideInPixels;
+		    u32 tileValue = GetTileValue(tileMap, mousePos);
+		    SetTileValue(&gameState->worldArena, tileMap, mousePos.absTileX, mousePos.absTileY, mousePos.absTileZ, 2);
+		    
 		}
 		
 

@@ -993,14 +993,6 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		
 		while (running)
 		{
-		    POINT mouseP;
-		    GetCursorPos(&mouseP);
-		    ScreenToClient(window, &mouseP);
-		    newInput->mouseX = mouseP.x;
-		    newInput->mouseY = mouseP.y;
-		    Win32ProcessKeyboardMessage(&newInput->mouseButtons[0],
-						GetKeyState(VK_LBUTTON) & (1 << 15), 0);
-		    
 		    newInput->dTime = targetSecondsPerFrame;
 		    FILETIME newDLLWriteTime = Win32GetLastWriteTime(sourceGameCodeDLLFullPath);
 		    if (CompareFileTime(&newDLLWriteTime, &game.dllLastWriteTime) != 0)
@@ -1022,7 +1014,15 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			    oldKeyboardController->buttons[buttonIndex].endedDown;
 		    }
 		    Win32ProcessPendingMessages(&win32State, newKeyboardController);
-		
+
+		    POINT mouseP;
+		    GetCursorPos(&mouseP);
+		    ScreenToClient(window, &mouseP);
+		    newInput->mouseX = mouseP.x;
+		    newInput->mouseY = mouseP.y;
+		    Win32ProcessKeyboardMessage(&newInput->mouseButtons[0],
+						GetKeyState(VK_LBUTTON) & (1 << 15), 0);
+		    
 		    for (DWORD controllerIndex = 0; controllerIndex <  maxControllerCount; ++controllerIndex)
 		    {
 			int ourControllerIndex = controllerIndex + 1;
