@@ -1,6 +1,6 @@
  jumper
 
- Timestamp is 6812e3d4 (Wed Apr 30 23:00:36 2025)
+ Timestamp is 681385af (Thu May  1 10:31:11 2025)
 
  Preferred load address is 0000000180000000
 
@@ -10434,13 +10434,14 @@
  0001:000e4cf0       ?fin$0@?0???$?RV<lambda_19eaff14c5fe7be5b1b106a862eb1091>@@AEAV<lambda_af29824b49a67d335554598d6cad2be6>@@V<lambda_3ce37f5b621ab310299ea5f68cbdf3bb>@@@?$__crt_seh_guarded_call@H@@QEAAH$$QEAV<lambda_19eaff14c5fe7be5b1b106a862eb1091>@@AEAV<lambda_af29824b49a67d335554598d6cad2be6>@@$$QEAV<lambda_3ce37f5b621ab310299ea5f68cbdf3bb>@@@Z@4HA 00000001800e5cf0 f   libucrtd:close.obj
  0001:000e4d10       ?fin$0@?0??__acrt_stdio_allocate_stream@@YA?AV__crt_stdio_stream@@XZ@4HA 00000001800e5d10 f   libucrtd:stream.obj
  0001:000e4d40       _IsNonwritableInCurrentImage$filt$0 00000001800e5d40 f   LIBCMTD:pesect.obj
- 0002:00000be0       $SG4902                    00000001800e7be0     jumper.obj
  0002:00000c68       GS_ExceptionPointers       00000001800e7c68     LIBCMTD:gs_report.obj
  0002:00000ce0       ?tokenTable@@3QBUStringLiteral@@B 00000001800e7ce0     libvcruntimed:undname.obj
  0002:00000df0       ?nameTable@@3QBUStringLiteral@@B 00000001800e7df0     libvcruntimed:undname.obj
  0002:00001320       ?rttiTable@@3QBUStringLiteral@@B 00000001800e8320     libvcruntimed:undname.obj
  0002:00001370       ?IndirectionName@@3QBUStringLiteral@@B 00000001800e8370     libvcruntimed:undname.obj
  0002:000013d0       ?PrefixName@@3QBUStringLiteral@@B 00000001800e83d0     libvcruntimed:undname.obj
+ 0002:000013f0       $SG4925                    00000001800e83f0     jumper.obj
+ 0002:00001408       $SG4931                    00000001800e8408     jumper.obj
  0002:00002370       ?result@?1??IsValidIdentChar@@YA_ND@Z@4U<unnamed-type-result>@?1??InitValidIdentChar@@YA@XZ@B 00000001800e9370     libvcruntimed:undname.obj
  0002:00002700       ?ExceptionTemplate@?1??UnwindNestedFrames@__FrameHandler4@@SAXPEA_KPEAUEHExceptionRecord@@PEAU_CONTEXT@@0PEAXPEAUFuncInfo4@FH4@@HHPEAUHandlerType4@6@PEAU_xDISPATCHER_CONTEXT@@E@Z@4U_EXCEPTION_RECORD@@B 00000001800e9700     libvcruntimed:risctrnsctrl.obj
  0002:000027c0       ?ExceptionTemplate@?1??UnwindNestedFrames@__FrameHandler3@@SAXPEA_KPEAUEHExceptionRecord@@PEAU_CONTEXT@@0PEAXPEBU_s_FuncInfo@@HHPEBU_s_HandlerType@@PEAU_xDISPATCHER_CONTEXT@@E@Z@4U_EXCEPTION_RECORD@@B 00000001800e97c0     libvcruntimed:risctrnsctrl.obj

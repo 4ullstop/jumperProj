@@ -452,19 +452,47 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 		if (controller->save.endedDown)
 		{
-		    
+		    u32 screenYVal = 0;
+		    u32 screenXVal = 0;
+		    u32 tilesPerWidth = 33;
+		    u32 tilesPerHeight = 9;
+		    debug_open_file_result unsavedMapFile = memory->DEBUGPlatformOpenFile("tilemap_test.map");
+		    for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
+		    {
+			for (u32 tileY = 0; tileY < tilesPerHeight; ++tileY)
+			{
+			    for (u32 tileX = 0; tileX < tilesPerWidth; ++tileX)
+			    {
+				u32 absTileX = screenXVal * tilesPerWidth + tileX;
+				u32 absTileY = screenYVal * tilesPerHeight + tileY;
+
+				u32 tileValue = GetTileValue(tileMap, absTileX, absTileY, 0);
+				if (unsavedMapFile.fileOpened)
+				{
+				    memory->DEBUGPlatformWriteToFile(&unsavedMapFile, &tileValue, sizeof(tileValue));
+				}
+			    }
+			}
+			screenYVal++;			
+		    }
+		    if (unsavedMapFile.fileOpened)
+		    {
+			memory->DEBUGPlatformCloseFile(&unsavedMapFile);
+		    }
+
 		}
 
 		if (input->mouseButtons[0].endedDown)
 		{
 		    tile_map_position mousePos = {};
 		    mousePos.absTileX = input->mouseX;
-		    mousePos.absTileY = input->mouseY;
+		    mousePos.absTileY = buffer->height - input->mouseY;
 		    mousePos.absTileZ = 0;
 		    //Divide the screen up based on the screen size
 		    //the dimension of the tiles in pixels and the number of tiles per screen
 		    mousePos.absTileX = mousePos.absTileX / tileSideInPixels;
 		    mousePos.absTileY = mousePos.absTileY / tileSideInPixels;
+		    mousePos = RecanonicalizePosition(tileMap, mousePos);
 		    u32 tileValue = GetTileValue(tileMap, mousePos);
 		    SetTileValue(&gameState->worldArena, tileMap, mousePos.absTileX, mousePos.absTileY, mousePos.absTileZ, 2);
 		    
