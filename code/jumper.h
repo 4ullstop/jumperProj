@@ -252,6 +252,12 @@ inline bool32 IsEntityInAir(entity* entity)
     return(result);
 }
 
+inline bool32 EntityAirCheckForCollision(entity* entity)
+{
+    bool32 result = (entity->dP.y != 0.0f) && (entity->dP.x == 0.0f);
+    return(result);    
+}
+
 struct game_state
 {
     i32 xOffset;

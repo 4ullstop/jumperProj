@@ -138,15 +138,18 @@ MovePlayer(game_state* gameState, entity* entity, r32 dt, v2 ddP)
 	ddP *= 1.0f / SquareRoot(ddPLength);
     }
 
-    r32 playerSpeed = 180.0f;
+    r32 playerSpeed = 300.0f;
     ddP *= playerSpeed;
-
     
     ddP += IsEntityInAir(entity) ? -2.0f * entity->dP : -35.0f*entity->dP;
+    //ddP += -35.0f*entity->dP;
+
     tile_map_position oldPlayerP = entity->p;
 
     v2 playerDelta = (0.5f * ddP * Square(dt) + entity->dP*dt);
-    entity->dP.y += dt * (-9.81f * tileMap->metersToPixels);
+    r32 gravity = IsEntityInAir(entity) ? -10.0f : -9.81f;
+    
+    entity->dP.y += dt * (gravity * tileMap->metersToPixels);
 
     entity->dP = ddP * dt + entity->dP;
 
@@ -169,6 +172,8 @@ MovePlayer(game_state* gameState, entity* entity, r32 dt, v2 ddP)
 
     r32 tRemaining = 1.0f;
     r32 tMin = 1.0f;
+
+    bool32 isFloor = false;
     for (u32 iteration = 0; (iteration < 4) && (tRemaining > 0.0f); ++iteration)
     {
 	tMin = 1.0f;
@@ -193,6 +198,7 @@ MovePlayer(game_state* gameState, entity* entity, r32 dt, v2 ddP)
 
 		    tile_map_difference relOldPlayerP = Subtract(tileMap, &entity->p, &testTileP);
 		    v2 rel = relOldPlayerP.dXY;
+		    
 		    if (TestWall(minCorner.x, rel.x, rel.y, playerDelta.x, playerDelta.y,
 				 &tMin, minCorner.y, maxCorner.y))
 		    {
@@ -212,12 +218,14 @@ MovePlayer(game_state* gameState, entity* entity, r32 dt, v2 ddP)
 				 &tMin, minCorner.x, maxCorner.x))
 		    {
 			wallNormal = v2{0, 1};
+			isFloor = true;
 		    }		    
 		}
 	    }
 	}
 	entity->p = Offset(tileMap, entity->p, tMin*playerDelta);
-	entity->dP = entity->dP - 1*Inner(entity->dP, wallNormal)*wallNormal;
+	i32 bounceValue = (isFloor || (!IsEntityInAir(entity))) ? 1 : 2;
+	entity->dP = entity->dP - bounceValue*Inner(entity->dP, wallNormal)*wallNormal;
 	playerDelta = playerDelta - 1 * Inner(playerDelta, wallNormal)*wallNormal;
 	tRemaining -= tMin;
     }
@@ -339,7 +347,6 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    u32 absTileX = screenX * tilesPerWidth + tileX;
 		    u32 absTileY = screenY * tilesPerHeight + tileY;
 
-		    //TODO: SetTileValue here
 
 		    if (screenIndex == 0)
 		    {
@@ -480,43 +487,70 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 			memory->DEBUGPlatformCloseFile(&unsavedMapFile);
 		    }
 
+#if 0
+		    //this did not solve things, instead it seemed to make the memory footprint of the program
+		    //grow
+		    debug_read_file_result result = memory->DEBUGPlatformReadEntireFile(thread, "tilemap_test.map");
+		    u32* tileValue = (u32*)result.contents;
+		    u32 screenY = 0;
+		    u32 screenX = 0;
+		    u32 absTileZ = 0;
+		    for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
+		    {
+			for (u32 tileY = 0; tileY < tilesPerHeight; ++tileY)
+			{
+			    for (u32 tileX = 0; tileX < tilesPerWidth; ++tileX)
+			    {
+				u32 absTileX = screenX * tilesPerWidth + tileX;
+				u32 absTileY = screenY * tilesPerHeight + tileY;
+
+				SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, *tileValue);
+
+				tileValue++;
+			    }
+			}
+			screenY++;
+		    }
+#endif
 		}
 
 		if (input->mouseButtons[0].endedDown)
 		{
-		    tile_map_position mousePos = {};
-		    mousePos.absTileX = input->mouseX;
-		    mousePos.absTileY = buffer->height - input->mouseY;
-		    mousePos.absTileZ = 0;
-		    //Divide the screen up based on the screen size
-		    //the dimension of the tiles in pixels and the number of tiles per screen
-		    mousePos.absTileX = mousePos.absTileX / tileSideInPixels;
-		    mousePos.absTileY = mousePos.absTileY / tileSideInPixels;
-		    mousePos = RecanonicalizePosition(tileMap, mousePos);
-		    u32 tileValue = GetTileValue(tileMap, mousePos);
-		    SetTileValue(&gameState->worldArena, tileMap, mousePos.absTileX, mousePos.absTileY, mousePos.absTileZ, 2);
-		    
-		}
-		
+		    if ((input->mouseX <= buffer->width) && (input->mouseX >= 0) && 
+			(input->mouseY <= buffer->height) && (input->mouseY >= 0))
+		    {
+			tile_map_position mousePos = {};
+			mousePos.absTileX = input->mouseX;
+			mousePos.absTileY = buffer->height - input->mouseY;
+			mousePos.absTileZ = 0;
 
+
+			//Divide the screen up based on the screen size
+			//the dimension of the tiles in pixels and the number of tiles per screen
+			mousePos.absTileX = mousePos.absTileX / tileSideInPixels;
+			mousePos.absTileY = mousePos.absTileY / tileSideInPixels;
+			mousePos = RecanonicalizePosition(tileMap, mousePos);
+			u32 tileValue = GetTileValue(tileMap, mousePos);
+			SetTileValue(&gameState->worldArena, tileMap, mousePos.absTileX, mousePos.absTileY, mousePos.absTileZ, 2);
+		    }
+		}
 		
 		bool32 movementDetected = false;
 		bool32 jumpInputDetected = false;
-		if (controller->moveUp.endedDown)
+		if (!IsEntityInAir(controllingEntity))
 		{
-		    ddP.y = 1.0f;
-		    movementDetected = true;
+		    if (controller->moveLeft.endedDown)
+		    {
+			ddP.x = -1.0f;
+			movementDetected = true;		    
+		    }
+		    if (controller->moveRight.endedDown)
+		    {
+			ddP.x = 1.0f;
+			movementDetected = true;		    
+		    }
 		}
-		if (controller->moveLeft.endedDown)
-		{
-		    ddP.x = -1.0f;
-		    movementDetected = true;		    
-		}
-		if (controller->moveRight.endedDown)
-		{
-		    ddP.x = 1.0f;
-		    movementDetected = true;		    
-		}
+
 		if (controller->moveDown.endedDown)
 		{
 		    //Where we implement the ability to jump
@@ -526,23 +560,23 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 			{
 			    if (controllingEntity->canJump)
 			    {
-				r32 dtMult = input->dTime * 60.0f;
+				r32 dtMult = input->dTime * 40.0f;
 				if (ddP.x != 0)
 				{
 				    r32 xVel = 10.0f;
 				    if (ddP.x > 0.0f)
 				    {
 					controllingEntity->dP.x +=
-					    ((r32)controllingEntity->framesHeld * dtMult + 10.0f);
+					    ((r32)controllingEntity->framesHeld * dtMult);
 				    }
 				    else
 				    {
 					controllingEntity->dP.x -=
-					    ((r32)controllingEntity->framesHeld * dtMult + 10.0f);
+					    ((r32)controllingEntity->framesHeld * dtMult);
 				    }
 				}
 
-				controllingEntity->dP.y += ((r32)controllingEntity->framesHeld * dtMult);
+				controllingEntity->dP.y += ((r32)controllingEntity->framesHeld * dtMult + 30.0f);
 				controllingEntity->canJump = false;
 			    }
 			}

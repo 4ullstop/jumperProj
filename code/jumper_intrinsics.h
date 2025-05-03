@@ -37,6 +37,27 @@ RoundReal32ToInt32(r32 real32)
     return(result);
 }
 
+inline r32
+Cube(r32 r)
+{
+    r32 result = r * r * r;
+    return(result);
+}
+
+inline i32
+Cube(i32 i)
+{
+    i32 result = i * i * i;
+    return(result);
+}
+
+inline u32 
+Cube(u32 u)
+{
+    u32 result = u * u * u;
+    return(result);
+}
+
 inline u32
 RoundReal32ToUInt32(r32 real32)
 {
