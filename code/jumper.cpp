@@ -76,6 +76,83 @@ DEBUGLoadBMP(thread_context* thread, debug_platform_read_entire_file* ReadEntire
 }
 
 internal void
+DrawBitmap(game_offscreen_buffer* buffer, loaded_bitmap* bitmap,
+	   r32 realX, r32 realY,
+	   i32 alignX = 0, i32 alignY = 0)
+{
+    realX -= (r32)alignX;
+    realY -= (r32)alignY;
+
+    i32 minX = RoundReal32ToInt32(realX);
+    i32 minY = RoundReal32ToInt32(realY);
+    i32 maxX = RoundReal32ToInt32(realX + (r32)bitmap->width);
+    i32 maxY = RoundReal32ToInt32(realY + (r32)bitmap->height);
+
+    i32 sourceOffsetX = 0;
+
+    if (minX < 0)
+    {
+	sourceOffsetX = -minX;
+    }
+
+    i32 sourceOffsetY = 0;
+    if (minY < 0)
+    {
+	sourceOffsetY = -minY;
+	minY = 0;
+    }
+
+    if (maxX > buffer->width)
+    {
+	maxX = buffer->width;
+    }
+    if (maxY > buffer->height)
+    {
+	maxY = buffer->height;
+    }
+
+    u32* sourceRow = bitmap->pixels + bitmap->width*(bitmap->height - 1);
+    sourceRow += -bitmap->width*sourceOffsetY + sourceOffsetX;
+    u8* destRow = ((u8*)buffer->memory +
+		   minX * buffer->bytesPerPixel +
+		   minY * buffer->pitch);
+
+    for (i32 y = minY; y < maxY; ++y)
+    {
+	u32* dest = (u32*)destRow;
+	u32* source = sourceRow;
+	for (i32 x = minX; x < maxX; ++x)
+	{
+	    r32 a = ((*source >> 24) &0xFF) / 255.0f;
+	    r32 SR = (r32)((*source >> 16) & 0xFF);
+	    r32 SG = (r32)((*source >> 8) & 0xFF);
+	    r32 SB = (r32)((*source >> 0) & 0xFF);
+	    
+	    r32 DR = (r32)((*dest >> 16) & 0xFF);
+	    r32 DG = (r32)((*dest >> 8) & 0xFF);
+	    r32 DB = (r32)((*dest >> 0) & 0xFF);
+
+	    r32 r = (1.0f-a)*DR + a*SR;
+	    r32 g = (1.0f-a)*DG + a*SG;
+	    r32 b = (1.0f-a)*DB + a*SB;
+
+	    *dest = (((u32)(r + 0.5f) << 16) |
+		     ((u32)(g + 0.5f) << 8) |
+		     ((u32)(b + 0.5f) << 0));
+
+	    if ((*source >> 24) > 128)
+	    {
+		*dest = *source;
+	    }
+	    ++dest;
+	    ++source;
+	}
+	destRow += buffer->pitch;
+	sourceRow -= bitmap->width;
+    }
+}
+
+internal void
 DrawRectangle(game_offscreen_buffer* buffer, v2 vMin, v2 vMax,
 	      r32 r, r32 g, r32 b)
 {
@@ -360,6 +437,11 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     if (!memory->isInitialized)
     {
 
+	background_bitmaps* background;
+	background = gameState->backgroundBitmaps;
+
+	background->blueTile = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/blue_brick_wall.bmp");
+	
 	AddEntity(gameState);
 	
 	gameState->cameraP.absTileX = 33/2;
@@ -732,32 +814,37 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    u32 row = gameState->cameraP.absTileY + relRow;
 	    u32 tileId = GetTileValue(tileMap, column, row, gameState->cameraP.absTileZ);
 
+	    v2 tileSide = {0.5f * tileSideInPixels, 0.5f * tileSideInPixels};
+	    v2 cen = {screenCenterX - metersToPixels * gameState->cameraP.offset.x +
+		((r32)relColumn) * tileSideInPixels,
+		screenCenterY + metersToPixels * gameState->cameraP.offset.y -
+		((r32)relRow) * tileSideInPixels};	    
 	    if (tileId >= 1)
 	    {
 		r32 gray = 0.5f;
 		if (tileId == 2)
 		{
 		    gray = 1.0f;
+		    background_bitmaps* background = &gameState->backgroundBitmaps[0];
+		    DrawBitmap(buffer, &background->blueTile, cen.x, cen.y);
 		}
-		if (tileId == 1)
+		else
 		{
-		    gray = 0.5f;
+		    if (tileId == 1)
+		    {
+			gray = 0.5f;
+		    }
+
+		    if (tileId > 2)
+		    {
+			gray = 0.25f;
+		    }
+
+		    v2 min = cen - tileSide;
+		    v2 max = cen + tileSide;
+
+		    DrawRectangle(buffer, min, max, gray, gray, gray);
 		}
-
-		if (tileId > 2)
-		{
-		    gray = 0.25f;
-		}
-
-		v2 tileSide = {0.5f * tileSideInPixels, 0.5f * tileSideInPixels};
-		v2 cen = {screenCenterX - metersToPixels * gameState->cameraP.offset.x +
-		    ((r32)relColumn) * tileSideInPixels,
-		    screenCenterY + metersToPixels * gameState->cameraP.offset.y -
-		    ((r32)relRow) * tileSideInPixels};
-		v2 min = cen - tileSide;
-		v2 max = cen + tileSide;
-
-		DrawRectangle(buffer, min, max, gray, gray, gray);
 	    }
 	}
     }

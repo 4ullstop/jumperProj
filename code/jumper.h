@@ -281,6 +281,14 @@ struct loaded_bitmap
     u32* pixels;
 };
 
+struct background_bitmaps
+{
+    i32 alignX;
+    i32 alignY;
+
+    loaded_bitmap blueTile;
+};
+
 struct game_state
 {
     i32 xOffset;
@@ -300,6 +308,8 @@ struct game_state
     u32 playerIndexForController[ArrayCount(((game_input*)0)->controllers)];
     u32 entityCount;
     entity entities[256];
+
+    background_bitmaps backgroundBitmaps[1];
 };
 
 
