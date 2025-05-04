@@ -2,7 +2,23 @@
 
 #include <stdint.h>
 
+#if !defined (COMPILER_MSVC)
+#define COMPILER_MSVC 0
+#endif
 
+#if !defined(COMPILER_LLVM)
+#define COMPILER_LLVM 0
+#endif
+
+#if !COMPILER_MSVC && !COMPILER_LLVM
+#if _MSC_VER
+#undef COMPILER_MSVC
+#define COMPILER_MSVC 1
+#endif
+#else
+#undef COMPILER_LLVM
+#define COMPILER_LLVM 1
+#endif
 
 #define local_persist static
 #define global_variable static
@@ -257,6 +273,13 @@ inline bool32 EntityAirCheckForCollision(entity* entity)
     bool32 result = (entity->dP.y != 0.0f) && (entity->dP.x == 0.0f);
     return(result);    
 }
+
+struct loaded_bitmap
+{
+    i32 width;
+    i32 height;
+    u32* pixels;
+};
 
 struct game_state
 {

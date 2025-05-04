@@ -1,6 +1,80 @@
 #include "jumper.h"
 #include "jumper_tile.cpp"
 
+#pragma pack(push, 1)
+struct bitmap_header
+{
+    u16 fileType;
+    u32 fileSize;
+    u16 reserved1;
+    u16 reserved2;
+    u32 bitmapOffset;
+    u32 size;
+    i32 width;
+    i32 height;
+    u16 planes;
+    u16 bitsPerPixel;
+    u32 compression;
+    u32 sizeOfBitmap;
+    i32 horzResolution;
+    i32 vertResolution;
+    u32 colorsUsed;
+    u32 colorsImportant;
+
+    u32 redMask;
+    u32 greenMask;
+    u32 blueMask;    
+};
+#pragma pack(pop)  
+
+internal loaded_bitmap
+DEBUGLoadBMP(thread_context* thread, debug_platform_read_entire_file* ReadEntireFile, char* filename)
+{
+    loaded_bitmap result = {};
+    debug_read_file_result readResult = ReadEntireFile(thread, filename);
+
+    if (readResult.contentsSize != 0)
+    {
+	bitmap_header* header = (bitmap_header*)readResult.contents;
+	u32* pixels = (u32*)((u8*)readResult.contents + header->bitmapOffset);
+	result.pixels = pixels;
+	result.width = header->width;
+	result.height = header->height;
+
+	Assert(header->compression == 3);
+
+	u32 redMask = header->redMask;
+	u32 greenMask = header->greenMask;
+	u32 blueMask = header->blueMask;
+	u32 alphaMask = ~(redMask | greenMask | blueMask);
+
+	bit_scan_result redShift = FindLeastSignificantSetBit(redMask);
+	bit_scan_result greenShift = FindLeastSignificantSetBit(greenMask);
+	bit_scan_result blueShift = FindLeastSignificantSetBit(blueMask);
+	bit_scan_result alphaShift = FindLeastSignificantSetBit(alphaMask);
+
+	Assert(redShift.found);
+	Assert(greenShift.found);
+	Assert(blueShift.found);
+	Assert(alphaShift.found);
+	
+	u32* sourceDest = pixels;
+	for (i32 y = 0; y < header->height; ++y)
+	{
+	    for (i32 x = 0; x < header->width; ++x)
+	    {
+		u32 c = *sourceDest;
+
+		*sourceDest++ = ((((c >> alphaShift.index) & 0xFF) << 24) |
+			       (((c >> redShift.index) & 0xFF) << 16) |
+			       (((c >> greenShift.index) & 0xFF) << 8) |
+			       (((c >> blueShift.index) & 0xFF) << 0));
+	    }
+	}
+    }
+    return(result);
+}
+
 internal void
 DrawRectangle(game_offscreen_buffer* buffer, v2 vMin, v2 vMax,
 	      r32 r, r32 g, r32 b)

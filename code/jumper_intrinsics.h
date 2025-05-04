@@ -107,5 +107,32 @@ ATan2(r32 y, r32 x)
     return(result);
 }
 
+struct bit_scan_result
+{
+    bool32 found;
+    u32 index;
+};
+    
+inline bit_scan_result
+FindLeastSignificantSetBit(u32 value)
+{
+    bit_scan_result result = {};
+    result.found = false;
+
+#if COMPILER_MSVC
+    result.found = _BitScanForward((unsigned long*)&result.index, value);
+#else
+    for (u32 test = 0; test < 32; ++test)
+    {
+	if (value & (1 << test))
+	{
+	    result.index = test;
+	    result.found = true;
+	    break;
+	}
+    }
+#endif
+    return(result);
+}
 #define JUMPER_INTRINSICS_H
 #endif
