@@ -641,7 +641,8 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 #endif
 	gameState->cameraChunkY = 18;
-	gameState->prevCameraChunkY = 18;	
+	gameState->prevCameraChunkY = 18;
+	gameState->cameraFollowingEntity = true;
 	memory->isInitialized = true;
     }
 
@@ -673,26 +674,22 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		r32 dPlayerX = 0.0f;
 		r32 dPlayerY = 0.0f;
 
-#if 0
-		//basic jump code, that doesn't have any other considerations besides holding a button
-		if (controller->actionDown.endedDown)
+		if (controller->scrollUp.endedDown)
 		{
-		    
-		    if (!(controllingEntity->dP.y < 0.0f) && !(controllingEntity->dP.y > 0.0f))
+		    gameState->cameraFollowingEntity = false;
+		    gameState->cameraP.absTileY += 18;
+		    gameState->cameraChunkY += 18;
+		}
+
+		if (controller->scrollDown.endedDown)
+		{
+		    if (gameState->cameraP.absTileY > 18)
 		    {
-			if (controllingEntity->canJump)
-			{
-			    controllingEntity->dP.y += 100.0f;
-			    controllingEntity->canJump = false;
-			}
+			gameState->cameraFollowingEntity = false;
+			gameState->cameraP.absTileY -= 18;
+			gameState->cameraChunkY -= 18;
 		    }
 		}
-		else
-		{
-		    controllingEntity->canJump = true;
-		}
-#endif
-
 
 		if (controller->save.endedDown)
 		{
@@ -897,7 +894,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 #else    
 
     entity* cameraFollowingEntity = GetEntity(gameState, gameState->cameraFollowingEntityIndex);
-    if (cameraFollowingEntity)
+    if (cameraFollowingEntity && gameState->cameraFollowingEntity)
     {
 	if ((cameraFollowingEntity->p.absTileY > gameState->cameraChunkY))
 	{

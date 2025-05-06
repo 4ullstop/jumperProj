@@ -138,7 +138,7 @@ struct game_controller_input
     
     union
     {
-	game_button_state buttons[13];
+	game_button_state buttons[15];
 	struct
 	{
 	    game_button_state moveUp;
@@ -159,6 +159,8 @@ struct game_controller_input
 
 	    game_button_state save;
 
+	    game_button_state scrollUp;
+	    game_button_state scrollDown;
 	    
 	    game_button_state terminator;
 	};
@@ -306,6 +308,8 @@ struct game_state
     r32 playerY;
 
     bool32 started;
+
+    bool32 cameraFollowingEntity;
     
     u32 cameraFollowingEntityIndex;
     tile_map_position cameraP;

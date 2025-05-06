@@ -748,6 +748,14 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 			}
 		    }
 		}
+		else if (VKCode == 'V')
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->scrollUp, isDown, wasDown);
+		}
+		else if (VKCode == 'C')
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->scrollDown, isDown, wasDown);
+		}
 		if (isDown)
 		{
 		    bool32 altKeyWasDown = ((msg.lParam & (1 << 29)) != 0);
@@ -756,6 +764,7 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 			Win32ProcessKeyboardMessage(&keyboardController->save, isDown, wasDown);		
 		    }
 		}
+
 #endif
 		if (isDown)
 		{
