@@ -1022,6 +1022,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		    newInput->mouseY = mouseP.y;
 		    Win32ProcessKeyboardMessage(&newInput->mouseButtons[0],
 						GetKeyState(VK_LBUTTON) & (1 << 15), 0);
+		    Win32ProcessKeyboardMessage(&newInput->mouseButtons[1],
+						GetKeyState(VK_RBUTTON) & (1 << 15), 0);		    
 		    
 		    for (DWORD controllerIndex = 0; controllerIndex <  maxControllerCount; ++controllerIndex)
 		    {

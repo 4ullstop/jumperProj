@@ -189,3 +189,22 @@ IsTileValueEmpty(u32 tileValue)
 
     return(empty);
 }
+
+internal void
+SetTileValueFromMouse(game_input* input, game_offscreen_buffer* buffer, tile_map* tileMap, game_state* gameState, i32 tileValue)
+{
+    i32 tileSideInPixels = 30;
+    if ((input->mouseX <= buffer->width) && (input->mouseX >= 0) &&
+	(input->mouseY <= buffer->height) && (input->mouseY >= 0))
+    {
+	tile_map_position mousePos = {};
+	mousePos.absTileX = input->mouseX;
+	mousePos.absTileY = buffer->height - input->mouseY;
+	mousePos.absTileZ = 0;
+
+	mousePos.absTileX /= tileSideInPixels;
+	mousePos.absTileY /= tileSideInPixels;
+	mousePos = RecanonicalizePosition(tileMap, mousePos);
+	SetTileValue(&gameState->worldArena, tileMap, mousePos.absTileX, mousePos.absTileY, mousePos.absTileZ, tileValue);
+    }    
+}

@@ -515,6 +515,12 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	background = gameState->backgroundBitmaps;
 
 	background->blueTile = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/blue_brick_wall.bmp");
+
+	player_bitmap* player;
+	player = gameState->playerBitmaps;
+	player->bitmap = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/player_face_forward.bmp");
+	player->alignX = 15;
+	player->alignY = 23;
 	
 	AddEntity(gameState);
 	
@@ -634,7 +640,8 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    
 
 #endif
-
+	gameState->cameraChunkY = 18;
+	gameState->prevCameraChunkY = 18;	
 	memory->isInitialized = true;
     }
 
@@ -746,23 +753,12 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 		if (input->mouseButtons[0].endedDown)
 		{
-		    if ((input->mouseX <= buffer->width) && (input->mouseX >= 0) && 
-			(input->mouseY <= buffer->height) && (input->mouseY >= 0))
-		    {
-			tile_map_position mousePos = {};
-			mousePos.absTileX = input->mouseX;
-			mousePos.absTileY = buffer->height - input->mouseY;
-			mousePos.absTileZ = 0;
+		    SetTileValueFromMouse(input, buffer, tileMap, gameState, 2);
+		}
 
-
-			//Divide the screen up based on the screen size
-			//the dimension of the tiles in pixels and the number of tiles per screen
-			mousePos.absTileX = mousePos.absTileX / tileSideInPixels;
-			mousePos.absTileY = mousePos.absTileY / tileSideInPixels;
-			mousePos = RecanonicalizePosition(tileMap, mousePos);
-			u32 tileValue = GetTileValue(tileMap, mousePos);
-			SetTileValue(&gameState->worldArena, tileMap, mousePos.absTileX, mousePos.absTileY, mousePos.absTileZ, 2);
-		    }
+		if (input->mouseButtons[1].endedDown)
+		{
+		    SetTileValueFromMouse(input, buffer, tileMap, gameState, 1);
 		}
 		
 		bool32 movementDetected = false;
@@ -856,7 +852,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 //    DrawRectangle(buffer, 0.0f, 0.0f, (r32)buffer->width, (r32)buffer->height, 1.0f, 0.0f, 1.0f);
 
     //draw our tilemap
-#if 0    
+#if 0
     for (int row = 0; row < 9; ++row)
     {
 	for (int column = 0; column < 17; ++column)
@@ -877,7 +873,48 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	}
     }
 #endif
+    //The issue with the camera centering stuff is here in the camera following code, will need to figure this out
+#if 0
+    entity* cameraFollowingEntity = GetEntity(gameState, gameState->cameraFollowingEntityIndex);
+    if (cameraFollowingEntity)
+    {
+	gameState->cameraP.absTileZ = cameraFollowingEntity->p.absTileZ;
 
+	u32 heightFromPlayerHead = 10;
+	tile_map_difference diff = Subtract(tileMap, &cameraFollowingEntity->p, &gameState->cameraP);
+
+
+	if (diff.dXY.y > 18)
+	{
+	    gameState->cameraP.absTileY += 9;
+	}
+	if (diff.dXY.y < -(18))
+	{
+	    gameState->cameraP.absTileY -= 9;
+	}
+    }
+
+#else    
+
+    entity* cameraFollowingEntity = GetEntity(gameState, gameState->cameraFollowingEntityIndex);
+    if (cameraFollowingEntity)
+    {
+	if ((cameraFollowingEntity->p.absTileY > gameState->cameraChunkY))
+	{
+	    gameState->cameraP.absTileY += 18;
+	    gameState->prevCameraChunkY = gameState->cameraChunkY;
+	    gameState->cameraChunkY += 18;
+	}
+	else if ((cameraFollowingEntity->p.absTileY < gameState->cameraChunkY) && (cameraFollowingEntity->p.absTileY <= gameState->prevCameraChunkY))
+	{
+	    gameState->cameraP.absTileY -= 18;
+	    gameState->prevCameraChunkY = gameState->cameraChunkY;	    
+	    gameState->cameraChunkY -= 18;
+	}
+    }
+    
+#endif
+    
     r32 screenCenterX = 0.5f *(r32)buffer->width;
     r32 screenCenterY = 0.5f * (r32)buffer->height;
     for (i32 relRow =  -10; relRow < 10; ++relRow)
@@ -927,35 +964,6 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	}
     }
 
-    //The issue with the camera centering stuff is here in the camera following code, will need to figure this out
-#if 0     
-    entity* cameraFollowingEntity = GetEntity(gameState, gameState->cameraFollowingEntityIndex);
-    if (cameraFollowingEntity)
-    {
-	gameState->cameraP.absTileZ = cameraFollowingEntity->p.absTileZ;
-
-	u32 heightFromPlayerHead = 10;
-	tile_map_difference diff = Subtract(tileMap, &cameraFollowingEntity->p, &gameState->cameraP);
-
-	if (diff.dXY.x > (9.0f*tileMap->tileSideInMeters))
-	{
-	    gameState->cameraP.absTileX += 17;
-	}
-	if (diff.dXY.x < -(9.0f*tileMap->tileSideInMeters))
-	{
-	    gameState->cameraP.absTileX -= 17;
-	}
-
-	if (diff.dXY.y > (5.0f*tileMap->tileSideInMeters))
-	{
-	    gameState->cameraP.absTileY += heightFromPlayerHead;
-	}
-	if (diff.dXY.y < -(5.0f*tileMap->tileSideInMeters))
-	{
-	    gameState->cameraP.absTileY -= heightFromPlayerHead;
-	}
-    }
-#endif	    
     //draw our player
     r32 playerWidth = 0.75f*(r32)tileWidth;
     r32 playerHeight = (r32)tileHeight;
@@ -980,8 +988,12 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    v2 playerLeftTop = {playerGroundPointX - 0.5f * metersToPixels * entity->width,
 		playerGroundPointY - 0.5f * metersToPixels * entity->height};
 	    v2 entityWidthHeight = {entity->width, entity->height};
-	    DrawRectangle(buffer, playerLeftTop, playerLeftTop + metersToPixels * entityWidthHeight,
-			  playerR, playerG, playerB);
+//	    DrawRectangle(buffer, playerLeftTop, playerLeftTop + metersToPixels * entityWidthHeight,
+//			  playerR, playerG, playerB);
+
+	    player_bitmap* player = &gameState->playerBitmaps[0];
+	    
+	    DrawBitmap(buffer, &player->bitmap, playerGroundPointX, playerGroundPointY, player->alignX, player->alignY);
 	}
     }
 

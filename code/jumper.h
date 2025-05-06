@@ -289,6 +289,14 @@ struct background_bitmaps
     loaded_bitmap blueTile;
 };
 
+struct player_bitmap
+{
+    i32 alignX;
+    i32 alignY;    
+
+    loaded_bitmap bitmap;
+};
+
 struct game_state
 {
     i32 xOffset;
@@ -301,7 +309,9 @@ struct game_state
     
     u32 cameraFollowingEntityIndex;
     tile_map_position cameraP;
-
+    u32 cameraChunkY;
+    u32 prevCameraChunkY;
+    
     memory_arena worldArena;
     world* world;
 
@@ -310,6 +320,7 @@ struct game_state
     entity entities[256];
 
     background_bitmaps backgroundBitmaps[1];
+    player_bitmap playerBitmaps[1];
 };
 
 
