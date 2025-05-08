@@ -124,6 +124,7 @@ struct game_button_state
     int halfTransitionCount;
     bool32 endedDown;
     bool32 wasDown;
+    bool32 started;
 };
 
 struct game_controller_input
@@ -135,6 +136,9 @@ struct game_controller_input
     r32 stickAverageY;
 
     bool32 started;
+
+    bool32 scrollUpDown;
+    bool32 scrollDownDown;    
     
     union
     {

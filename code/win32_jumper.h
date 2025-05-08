@@ -60,6 +60,9 @@ struct win32_state
     
     char exeFilename[WIN32_STATE_FILE_NAME_COUNT];
     char* onePastLastExeFilenameSlash;
+
+    bool32 scrollUpWasDown;
+    bool32 scrollDownWasDown;    
 };
 
 

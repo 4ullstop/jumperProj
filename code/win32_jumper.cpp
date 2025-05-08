@@ -508,6 +508,38 @@ LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
 	Win32DisplayBufferWindow(&globalBackBuffer, deviceContext, x, y, dimension.width, dimension.height);
 	EndPaint(hwnd, &paint);
     } break;
+    case WM_SYSKEYDOWN:
+    case WM_SYSKEYUP:
+    case WM_KEYDOWN:
+    case WM_KEYUP:
+    {
+	u32 VKCode = (u32)wParam;
+	bool32 wasDown = ((lParam & (1 << 30)) != 0);
+	bool32 isDown = ((lParam & (1 << 31)) == 0);
+	if (wasDown != isDown)
+	{
+	    if (VKCode == 'W')
+	    {
+
+	    }
+	    else if (VKCode == 'A')
+	    {
+		
+	    }
+	    else if (VKCode == 'S')
+	    {
+
+	    }
+	    else if (VKCode == 'D')
+	    {
+
+	    }
+	    else if (VKCode == VK_UP)
+	    {
+
+	    }
+	}
+    }
     default:
     {
 	result = DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -525,7 +557,6 @@ Win32ProcessKeyboardMessage(game_button_state* newState, bool32 isDown, bool32 w
 	newState->endedDown = isDown;
 	++newState->halfTransitionCount;
     }
-    newState->wasDown = wasDown;
 }
 
 internal void
@@ -661,8 +692,8 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 	} break;
 	case WM_SYSKEYDOWN:
 	case WM_SYSKEYUP:
+	case WM_KEYUP:	    
 	case WM_KEYDOWN:
-	case WM_KEYUP:
 	{
 	    u32 VKCode = (u32)msg.wParam;
 	    bool32 wasDown = ((msg.lParam & (1 << 30)) != 0);
@@ -685,26 +716,6 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 		else if (VKCode == 'D')
 		{
 		    Win32ProcessKeyboardMessage(&keyboardController->moveRight, isDown, wasDown);
-		}
-		else if (VKCode == 'Q')
-		{
-		    Win32ProcessKeyboardMessage(&keyboardController->rightShoulder, isDown, wasDown);
-		}
-		else if (VKCode == VK_UP)
-		{
-		    Win32ProcessKeyboardMessage(&keyboardController->actionUp, isDown, wasDown);
-		}
-		else if (VKCode == VK_DOWN)
-		{
-		    Win32ProcessKeyboardMessage(&keyboardController->actionDown, isDown, wasDown);
-		}
-		else if (VKCode == VK_LEFT)
-		{
-		    Win32ProcessKeyboardMessage(&keyboardController->actionLeft, isDown, wasDown);
-		}
-		else if (VKCode == VK_RIGHT)
-		{
-		    Win32ProcessKeyboardMessage(&keyboardController->actionRight, isDown, wasDown);
 		}
 		else if (VKCode == VK_ESCAPE)
 		{
@@ -748,13 +759,30 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 			}
 		    }
 		}
+
 		else if (VKCode == 'V')
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->scrollUp, isDown, wasDown);
+		    if (isDown)
+		    {
+			Win32ProcessKeyboardMessage(&keyboardController->scrollUp, isDown, wasDown);
+			keyboardController->scrollUp.started = true;
+		    }
+		    else
+		    {
+			keyboardController->scrollUp.started = false;
+		    }
+		    
 		}
 		else if (VKCode == 'C')
 		{
-		    Win32ProcessKeyboardMessage(&keyboardController->scrollDown, isDown, wasDown);
+		    if (isDown)
+		    {
+			Win32ProcessKeyboardMessage(&keyboardController->scrollDown, isDown, wasDown);
+		    }
+		    else
+		    {
+			keyboardController->scrollDown.started = false;
+		    }
 		}
 		if (isDown)
 		{
@@ -765,7 +793,7 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 		    }
 		}
 
-#endif
+#endif		
 		if (isDown)
 		{
 		    bool32 altKeyWasDown = ((msg.lParam & (1 << 29)) != 0);
@@ -1021,6 +1049,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		    {
 			newKeyboardController->buttons[buttonIndex].endedDown =
 			    oldKeyboardController->buttons[buttonIndex].endedDown;
+			newKeyboardController->buttons[buttonIndex].started =
+			    oldKeyboardController->buttons[buttonIndex].started;			
 		    }
 		    Win32ProcessPendingMessages(&win32State, newKeyboardController);
 
@@ -1155,7 +1185,6 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			if (!soundInfo.bufferFilled)
 			{
 			    game.GetSoundData(&soundInfo);
-			    //TODO: After you get the sound data, fill the audio buffer and start playing the sound
 			    Win32PlayAndSubmitSound(&audioInfo, soundInfo.buffer);
 			}
 		    }

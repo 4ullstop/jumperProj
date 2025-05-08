@@ -1,6 +1,6 @@
  jumper
 
- Timestamp is 681975d5 (Mon May  5 22:37:09 2025)
+ Timestamp is 681c0143 (Wed May  7 20:56:35 2025)
 
  Preferred load address is 0000000180000000
 
@@ -2768,8 +2768,8 @@
  0001:000dc693       RtlUnwind                  00000001800dd693 f   kernel32:KERNEL32.dll
  0001:000dc6e0       ?PushSize_@@YAPEAXPEAUmemory_arena@@_K@Z 00000001800dd6e0 f   jumper.obj
  0001:000dca70       ?Subtract@@YA?AUtile_map_difference@@PEAUtile_map@@PEAUtile_map_position@@1@Z 00000001800dda70 f   jumper.obj
- 0001:000dea10       GameGetSoundData           00000001800dfa10 f   jumper.obj
- 0001:000dea20       GameUpdateAndRender        00000001800dfa20 f   jumper.obj
+ 0001:000dea30       GameGetSoundData           00000001800dfa30 f   jumper.obj
+ 0001:000dea40       GameUpdateAndRender        00000001800dfa40 f   jumper.obj
  0001:000e0d10       _guard_dispatch_icall_nop  00000001800e1d10 f   LIBCMTD:guard_dispatch.obj
  0001:000e0d30       _guard_xfg_dispatch_icall_nop 00000001800e1d30 f   LIBCMTD:guard_xfg_dispatch.obj
  0001:000e1d70       memcpy_repmovs             00000001800e2d70 f   libvcruntimed:memcpy.obj
@@ -10198,14 +10198,14 @@
  0001:000dc8f0       ?SetTileValue@@YAXPEAUmemory_arena@@PEAUtile_map@@IIII@Z 00000001800dd8f0 f   jumper.obj
  0001:000dcbd0       ?IsTileValueEmpty@@YAHI@Z  00000001800ddbd0 f   jumper.obj
  0001:000dcc10       ?SetTileValueFromMouse@@YAXPEAUgame_input@@PEAUgame_offscreen_buffer@@PEAUtile_map@@PEAUgame_state@@H@Z 00000001800ddc10 f   jumper.obj
- 0001:000dcdc0       ?DEBUGLoadBMP@@YA?AUloaded_bitmap@@PEAUthread_context@@P6A?AUdebug_read_file_result@@0PEAD@Z1@Z 00000001800dddc0 f   jumper.obj
- 0001:000dd0c0       ?DrawBitmap@@YAXPEAUgame_offscreen_buffer@@PEAUloaded_bitmap@@MMHH@Z 00000001800de0c0 f   jumper.obj
- 0001:000dd540       ?DrawBackgroundTile@@YAXPEAUgame_offscreen_buffer@@PEAUloaded_bitmap@@Uv2@@2@Z 00000001800de540 f   jumper.obj
- 0001:000dd950       ?DrawRectangle@@YAXPEAUgame_offscreen_buffer@@Uv2@@1MMM@Z 00000001800de950 f   jumper.obj
- 0001:000ddb30       ?AddEntity@@YAIPEAUgame_state@@@Z 00000001800deb30 f   jumper.obj
- 0001:000ddba0       ?InitializePlayer@@YAXPEAUgame_state@@I@Z 00000001800deba0 f   jumper.obj
- 0001:000ddc60       ?TestWall@@YAHMMMMMPEAMMM@Z 00000001800dec60 f   jumper.obj
- 0001:000ddd70       ?MovePlayer@@YAXPEAUgame_state@@PEAUentity@@MUv2@@@Z 00000001800ded70 f   jumper.obj
+ 0001:000dcde0       ?DEBUGLoadBMP@@YA?AUloaded_bitmap@@PEAUthread_context@@P6A?AUdebug_read_file_result@@0PEAD@Z1@Z 00000001800ddde0 f   jumper.obj
+ 0001:000dd0e0       ?DrawBitmap@@YAXPEAUgame_offscreen_buffer@@PEAUloaded_bitmap@@MMHH@Z 00000001800de0e0 f   jumper.obj
+ 0001:000dd560       ?DrawBackgroundTile@@YAXPEAUgame_offscreen_buffer@@PEAUloaded_bitmap@@Uv2@@2@Z 00000001800de560 f   jumper.obj
+ 0001:000dd970       ?DrawRectangle@@YAXPEAUgame_offscreen_buffer@@Uv2@@1MMM@Z 00000001800de970 f   jumper.obj
+ 0001:000ddb50       ?AddEntity@@YAIPEAUgame_state@@@Z 00000001800deb50 f   jumper.obj
+ 0001:000ddbc0       ?InitializePlayer@@YAXPEAUgame_state@@I@Z 00000001800debc0 f   jumper.obj
+ 0001:000ddc80       ?TestWall@@YAHMMMMMPEAMMM@Z 00000001800dec80 f   jumper.obj
+ 0001:000ddd90       ?MovePlayer@@YAXPEAUgame_state@@PEAUentity@@MUv2@@@Z 00000001800ded90 f   jumper.obj
  0001:000e0d00       $$000000                   00000001800e1d00     LIBCMTD:guard_dispatch.obj
  0001:000e0d20       $$000000                   00000001800e1d20     LIBCMTD:guard_xfg_dispatch.obj
  0001:000e1d70       $$000000                   00000001800e2d70     libvcruntimed:memcpy.obj
@@ -10449,10 +10449,10 @@
  0002:00001320       ?rttiTable@@3QBUStringLiteral@@B 00000001800e8320     libvcruntimed:undname.obj
  0002:00001370       ?IndirectionName@@3QBUStringLiteral@@B 00000001800e8370     libvcruntimed:undname.obj
  0002:000013d0       ?PrefixName@@3QBUStringLiteral@@B 00000001800e83d0     libvcruntimed:undname.obj
- 0002:000013f0       $SG5209                    00000001800e83f0     jumper.obj
- 0002:00001408       $SG5210                    00000001800e8408     jumper.obj
- 0002:00001428       $SG5211                    00000001800e8428     jumper.obj
- 0002:00001440       $SG5220                    00000001800e8440     jumper.obj
+ 0002:000013f0       $SG5212                    00000001800e83f0     jumper.obj
+ 0002:00001408       $SG5213                    00000001800e8408     jumper.obj
+ 0002:00001428       $SG5214                    00000001800e8428     jumper.obj
+ 0002:00001440       $SG5223                    00000001800e8440     jumper.obj
  0002:00002370       ?result@?1??IsValidIdentChar@@YA_ND@Z@4U<unnamed-type-result>@?1??InitValidIdentChar@@YA@XZ@B 00000001800e9370     libvcruntimed:undname.obj
  0002:00002700       ?ExceptionTemplate@?1??UnwindNestedFrames@__FrameHandler4@@SAXPEA_KPEAUEHExceptionRecord@@PEAU_CONTEXT@@0PEAXPEAUFuncInfo4@FH4@@HHPEAUHandlerType4@6@PEAU_xDISPATCHER_CONTEXT@@E@Z@4U_EXCEPTION_RECORD@@B 00000001800e9700     libvcruntimed:risctrnsctrl.obj
  0002:000027c0       ?ExceptionTemplate@?1??UnwindNestedFrames@__FrameHandler3@@SAXPEA_KPEAUEHExceptionRecord@@PEAU_CONTEXT@@0PEAXPEBU_s_FuncInfo@@HHPEBU_s_HandlerType@@PEAU_xDISPATCHER_CONTEXT@@E@Z@4U_EXCEPTION_RECORD@@B 00000001800e97c0     libvcruntimed:risctrnsctrl.obj

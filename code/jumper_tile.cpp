@@ -205,6 +205,7 @@ SetTileValueFromMouse(game_input* input, game_offscreen_buffer* buffer, tile_map
 	mousePos.absTileX /= tileSideInPixels;
 	mousePos.absTileY /= tileSideInPixels;
 	mousePos = RecanonicalizePosition(tileMap, mousePos);
+	mousePos.absTileY += (gameState->cameraChunkY - 18);
 	SetTileValue(&gameState->worldArena, tileMap, mousePos.absTileX, mousePos.absTileY, mousePos.absTileZ, tileValue);
     }    
 }

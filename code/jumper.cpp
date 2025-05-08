@@ -637,8 +637,6 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    }
 	    screenY++;
 	}
-	    
-
 #endif
 	gameState->cameraChunkY = 18;
 	gameState->prevCameraChunkY = 18;
@@ -674,21 +672,24 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		r32 dPlayerX = 0.0f;
 		r32 dPlayerY = 0.0f;
 
-		if (controller->scrollUp.endedDown)
+		if (controller->scrollUp.endedDown && (controller->scrollUp.started == false))
 		{
 		    gameState->cameraFollowingEntity = false;
 		    gameState->cameraP.absTileY += 18;
 		    gameState->cameraChunkY += 18;
+		    controller->scrollUp.started = true;
 		}
 
-		if (controller->scrollDown.endedDown)
+		if (controller->scrollDown.endedDown && (controller->scrollDown.started == false))
 		{
 		    if (gameState->cameraP.absTileY > 18)
 		    {
 			gameState->cameraFollowingEntity = false;
 			gameState->cameraP.absTileY -= 18;
 			gameState->cameraChunkY -= 18;
+
 		    }
+		    controller->scrollDown.started = true;		    
 		}
 
 		if (controller->save.endedDown)
@@ -720,32 +721,6 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    {
 			memory->DEBUGPlatformCloseFile(&unsavedMapFile);
 		    }
-
-#if 0
-		    //this did not solve things, instead it seemed to make the memory footprint of the program
-		    //grow
-		    debug_read_file_result result = memory->DEBUGPlatformReadEntireFile(thread, "tilemap_test.map");
-		    u32* tileValue = (u32*)result.contents;
-		    u32 screenY = 0;
-		    u32 screenX = 0;
-		    u32 absTileZ = 0;
-		    for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
-		    {
-			for (u32 tileY = 0; tileY < tilesPerHeight; ++tileY)
-			{
-			    for (u32 tileX = 0; tileX < tilesPerWidth; ++tileX)
-			    {
-				u32 absTileX = screenX * tilesPerWidth + tileX;
-				u32 absTileY = screenY * tilesPerHeight + tileY;
-
-				SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, *tileValue);
-
-				tileValue++;
-			    }
-			}
-			screenY++;
-		    }
-#endif
 		}
 
 		if (input->mouseButtons[0].endedDown)
@@ -765,14 +740,17 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    if (controller->moveLeft.endedDown)
 		    {
 			ddP.x = -1.0f;
-			movementDetected = true;		    
+			movementDetected = true;
+			gameState->cameraFollowingEntity = true;
 		    }
 		    if (controller->moveRight.endedDown)
 		    {
 			ddP.x = 1.0f;
-			movementDetected = true;		    
+			movementDetected = true;
+			gameState->cameraFollowingEntity = true;			
 		    }
 		}
+
 
 		if (controller->moveDown.endedDown)
 		{
@@ -809,8 +787,6 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 			controllingEntity->canJump = true;
 			ddP.x = 0.0f;			
 		    }
-		    //currently the jump is frame rate dependent, meaning the higher the frames,
-		    //the higher you can jump, you're gonna wanna fix this at some point but it works for now
 		    if (controllingEntity->framesHeld == 100)
 		    {
 			//we can jump now
@@ -843,55 +819,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     r32 tileWidth = 60;
     r32 tileHeight = 60;
 
-    
 
-    //clear the background
-//    DrawRectangle(buffer, 0.0f, 0.0f, (r32)buffer->width, (r32)buffer->height, 1.0f, 0.0f, 1.0f);
-
-    //draw our tilemap
-#if 0
-    for (int row = 0; row < 9; ++row)
-    {
-	for (int column = 0; column < 17; ++column)
-	{
-	    u32 tileId = tileMap[row][column];
-	    r32 gray = 0.5f;
-	    if (tileId == 1)
-	    {
-		gray = 1.0f;
-	    }
-
-	    r32 minX = upperLeftX + ((r32)column) * tileWidth;
-	    r32 minY = upperLeftY + ((r32)row) * tileHeight;
-	    r32 maxX = minX + tileWidth;
-	    r32 maxY = minY + tileHeight;
-
-	    DrawRectangle(buffer, minX, minY, maxX, maxY, gray, gray, gray);
-	}
-    }
-#endif
-    //The issue with the camera centering stuff is here in the camera following code, will need to figure this out
-#if 0
-    entity* cameraFollowingEntity = GetEntity(gameState, gameState->cameraFollowingEntityIndex);
-    if (cameraFollowingEntity)
-    {
-	gameState->cameraP.absTileZ = cameraFollowingEntity->p.absTileZ;
-
-	u32 heightFromPlayerHead = 10;
-	tile_map_difference diff = Subtract(tileMap, &cameraFollowingEntity->p, &gameState->cameraP);
-
-
-	if (diff.dXY.y > 18)
-	{
-	    gameState->cameraP.absTileY += 9;
-	}
-	if (diff.dXY.y < -(18))
-	{
-	    gameState->cameraP.absTileY -= 9;
-	}
-    }
-
-#else    
 
     entity* cameraFollowingEntity = GetEntity(gameState, gameState->cameraFollowingEntityIndex);
     if (cameraFollowingEntity && gameState->cameraFollowingEntity)
@@ -909,8 +837,6 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    gameState->cameraChunkY -= 18;
 	}
     }
-    
-#endif
     
     r32 screenCenterX = 0.5f *(r32)buffer->width;
     r32 screenCenterY = 0.5f * (r32)buffer->height;
@@ -993,5 +919,4 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    DrawBitmap(buffer, &player->bitmap, playerGroundPointX, playerGroundPointY, player->alignX, player->alignY);
 	}
     }
-
 }
