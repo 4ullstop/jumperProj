@@ -303,6 +303,31 @@ struct player_bitmap
     loaded_bitmap bitmap;
 };
 
+enum e_player_bitmap_location : u8
+{
+    Stand,
+    Launch_01,
+    Launch_02,
+    Launch_03,
+    Air
+};
+
+
+struct player_anim_bitmap
+{
+    loaded_bitmap fullBitmap;
+
+    e_player_bitmap_location playerBitmapLocation;
+
+    i32 bitmapXLen;
+    i32 bitmapYLen;
+    
+    loaded_bitmap playerAnims[5];
+
+    i32 numOfSprites;
+};
+
+
 struct game_state
 {
     i32 xOffset;
@@ -329,8 +354,12 @@ struct game_state
 
     background_bitmaps backgroundBitmaps[1];
     player_bitmap playerBitmaps[1];
-};
 
+
+
+    player_bitmap playerAnimations[4];
+    player_bitmap* currentPlayerBitmap;
+};
 
 #define JUMPER_H
 #endif

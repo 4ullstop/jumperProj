@@ -759,7 +759,6 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 			}
 		    }
 		}
-
 		else if (VKCode == 'V')
 		{
 		    if (isDown)

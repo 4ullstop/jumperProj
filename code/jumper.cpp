@@ -516,12 +516,14 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 	background->blueTile = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/blue_brick_wall.bmp");
 
+
+
 	player_bitmap* player;
 	player = gameState->playerBitmaps;
 	player->bitmap = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/player_face_forward.bmp");
 	player->alignX = 15;
 	player->alignY = 23;
-	
+
 	AddEntity(gameState);
 	
 	gameState->cameraP.absTileX = 33/2;
@@ -529,6 +531,29 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	
 	InitializeArena(&gameState->worldArena, memory->permanentStorageSize - sizeof(game_state),
 			(u8*)memory->permanentStorage + sizeof(game_state));
+
+
+	gameState->playerAnimations[0].bitmap = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/player_idle.bmp");
+	gameState->playerAnimations[0].alignX = 15;
+	gameState->playerAnimations[0].alignY = 23;
+	
+	gameState->playerAnimations[1].bitmap = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/player_idle.bmp");
+	gameState->playerAnimations[1].alignX = 15;
+	gameState->playerAnimations[1].alignY = 23;
+	
+	gameState->playerAnimations[2].bitmap = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/player_launch_01.bmp");
+	gameState->playerAnimations[2].alignX = 15;
+	gameState->playerAnimations[2].alignY = 23;
+	
+	gameState->playerAnimations[3].bitmap = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/player_launch_02.bmp");
+	gameState->playerAnimations[3].alignX = 15;
+	gameState->playerAnimations[3].alignY = 23;
+	
+	gameState->playerAnimations[4].bitmap = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/player_in_air.bmp");
+	gameState->playerAnimations[4].alignX = 15;
+	gameState->playerAnimations[4].alignY = 23;		
+
+	gameState->currentPlayerBitmap = &gameState->playerAnimations[0];
 
 	gameState->world = PushStruct(&gameState->worldArena, world);
 	world* world = gameState->world;
@@ -659,8 +684,12 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	game_controller_input* controller = GetController(input, controllerIndex);
 
 	entity* controllingEntity = GetEntity(gameState, gameState->playerIndexForController[controllerIndex]);
+
+
 	if (controllingEntity)
 	{
+	    bool32 jumpAnimDetected = false;
+	    bool32 moveAnimDetected = false;	    
 	    v2 ddP = {};
 	    if (controller->isAnalog)
 	    {
@@ -741,17 +770,19 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    {
 			ddP.x = -1.0f;
 			movementDetected = true;
+			moveAnimDetected = true;
 			gameState->cameraFollowingEntity = true;
 		    }
 		    if (controller->moveRight.endedDown)
 		    {
 			ddP.x = 1.0f;
 			movementDetected = true;
+			moveAnimDetected = true;			
 			gameState->cameraFollowingEntity = true;			
 		    }
 		}
 
-
+		bool32 jumpButtonDetected = false;
 		if (controller->moveDown.endedDown)
 		{
 		    //Where we implement the ability to jump
@@ -779,12 +810,16 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 				controllingEntity->dP.y += ((r32)controllingEntity->framesHeld * dtMult + 30.0f);
 				controllingEntity->canJump = false;
+
 			    }
 			}
+			jumpAnimDetected = false;
+			moveAnimDetected = true;
 		    }
 		    else
 		    {
 			controllingEntity->canJump = true;
+			jumpAnimDetected = true;			
 			ddP.x = 0.0f;			
 		    }
 		    if (controllingEntity->framesHeld == 100)
@@ -793,7 +828,16 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 			controllingEntity->framesHeld = 0;
 			
 		    }
-		    controllingEntity->framesHeld++;		    
+		    else if (controllingEntity->framesHeld == 10)
+		    {
+			gameState->currentPlayerBitmap = &gameState->playerAnimations[2];
+		    }
+		    else if (controllingEntity->framesHeld == 60)
+		    {
+			gameState->currentPlayerBitmap = &gameState->playerAnimations[3];
+		    }
+		    controllingEntity->framesHeld++;
+
 		}
 		else
 		{
@@ -802,6 +846,11 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 		MovePlayer(gameState, controllingEntity, input->dTime, ddP);
 	    }
+	    if ((!jumpAnimDetected) && (moveAnimDetected))
+	    {
+		gameState->currentPlayerBitmap = &gameState->playerAnimations[0];
+	    }
+	    
 	}
 	else
 	{
@@ -914,8 +963,9 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 //	    DrawRectangle(buffer, playerLeftTop, playerLeftTop + metersToPixels * entityWidthHeight,
 //			  playerR, playerG, playerB);
 
-	    player_bitmap* player = &gameState->playerBitmaps[0];
-	    
+//	    player_bitmap* player = &gameState->playerBitmaps[0];
+
+	    player_bitmap* player = gameState->currentPlayerBitmap;
 	    DrawBitmap(buffer, &player->bitmap, playerGroundPointX, playerGroundPointY, player->alignX, player->alignY);
 	}
     }
