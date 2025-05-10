@@ -543,11 +543,11 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	
 	gameState->playerAnimations[2].bitmap = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/player_launch_01.bmp");
 	gameState->playerAnimations[2].alignX = 15;
-	gameState->playerAnimations[2].alignY = 23;
+	gameState->playerAnimations[2].alignY = 18;
 	
 	gameState->playerAnimations[3].bitmap = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/player_launch_02.bmp");
 	gameState->playerAnimations[3].alignX = 15;
-	gameState->playerAnimations[3].alignY = 23;
+	gameState->playerAnimations[3].alignY = 17;
 	
 	gameState->playerAnimations[4].bitmap = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/player_in_air.bmp");
 	gameState->playerAnimations[4].alignX = 15;
@@ -828,7 +828,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 			controllingEntity->framesHeld = 0;
 			
 		    }
-		    else if (controllingEntity->framesHeld == 10)
+		    else if (controllingEntity->framesHeld == 5)
 		    {
 			gameState->currentPlayerBitmap = &gameState->playerAnimations[2];
 		    }
@@ -846,6 +846,8 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 		MovePlayer(gameState, controllingEntity, input->dTime, ddP);
 	    }
+	    
+
 	    if ((!jumpAnimDetected) && (moveAnimDetected))
 	    {
 		gameState->currentPlayerBitmap = &gameState->playerAnimations[0];
@@ -861,6 +863,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		gameState->playerIndexForController[controllerIndex] = entityIndex;
 	    }
 	}
+	
     }
 
     r32 upperLeftX = -30;

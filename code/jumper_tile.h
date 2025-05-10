@@ -25,6 +25,19 @@ struct tile_chunk_position
     u32 relTileY;
 };
 
+enum e_tile_texture : u8
+{
+    blueBackground,
+    blueBrick,
+    grayBrick
+};
+
+struct tile_value
+{
+    bool32 collisionEnabled;
+    e_tile_texture tileTexture;
+};
+
 struct tile_chunk
 {
     u32* tiles;
@@ -47,6 +60,7 @@ struct tile_map
     tile_chunk* tileChunks;
 
     r32 metersToPixels;
+
 };
 #pragma pack(pop)
 
