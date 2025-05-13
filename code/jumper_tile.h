@@ -32,15 +32,17 @@ enum e_tile_texture : u8
     grayBrick
 };
 
+#pragma pack(push, 1)
 struct tile_value
 {
     bool32 collisionEnabled;
     e_tile_texture tileTexture;
 };
+#pragma pack(pop)
 
 struct tile_chunk
 {
-    u32* tiles;
+    tile_value* tiles;
 };
 
 

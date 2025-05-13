@@ -1,7 +1,7 @@
 #include "jumper_tile.h"
 
 inline void
-SetTileValueUnchecked(tile_map* tileMap, tile_chunk* tileChunk, u32 tileX, u32 tileY, u32 tileValue)
+SetTileValueUnchecked(tile_map* tileMap, tile_chunk* tileChunk, u32 tileX, u32 tileY, tile_value tileValue)
 {
     //Directly set the value of the tile specified here
     Assert(tileChunk);
@@ -14,7 +14,7 @@ SetTileValueUnchecked(tile_map* tileMap, tile_chunk* tileChunk, u32 tileX, u32 t
 inline u32
 SetTileValue(tile_map* tileMap, tile_chunk* tileChunk,
 	     u32 testTileX, u32 testTileY,
-	     u32 tileValue)
+	     tile_value tileValue)
 {
     u32 tileChunkValue = 0;
 
@@ -58,21 +58,21 @@ GetTileChunk(tile_map* tileMap, u32 tileChunkX, u32 tileChunkY, u32 tileChunkZ)
     return(tileChunk);
 }
 
-inline u32
+inline tile_value
 GetTileChunkValueUnchecked(tile_map* tileMap, tile_chunk* tileChunk, u32 tileX, u32 tileY)
 {
     Assert(tileChunk);
     Assert(tileX < tileMap->chunkDim);
     Assert(tileY < tileMap->chunkDim);
     
-    u32 result = tileChunk->tiles[tileY * tileMap->chunkDim + tileX];
+    tile_value result = tileChunk->tiles[tileY * tileMap->chunkDim + tileX];
     return(result);
 }
 				  
-internal u32
+internal tile_value
 GetTileValue(tile_map* tileMap, tile_chunk* tileChunk, u32 testTileX, u32 testTileY)
 {
-    u32 tileChunkValue = 0;
+    tile_value tileChunkValue = {};
 
     if (tileChunk && tileChunk->tiles)
     {
@@ -82,27 +82,27 @@ GetTileValue(tile_map* tileMap, tile_chunk* tileChunk, u32 testTileX, u32 testTi
     return(tileChunkValue);
 }
 
-internal u32
+internal tile_value
 GetTileValue(tile_map* tileMap, u32 absTileX, u32 absTileY, u32 absTileZ)
 {
     tile_chunk_position chunkPos = GetChunkPositionFor(tileMap, absTileX, absTileY, absTileZ);
     tile_chunk* tileChunk = GetTileChunk(tileMap, chunkPos.tileChunkX, chunkPos.tileChunkY, chunkPos.tileChunkZ);
-    u32 tileChunkValue = GetTileValue(tileMap, tileChunk, chunkPos.relTileX, chunkPos.relTileY);
+    tile_value tileChunkValue = GetTileValue(tileMap, tileChunk, chunkPos.relTileX, chunkPos.relTileY);
 
     return(tileChunkValue);
 }
 
-internal u32
+internal tile_value
 GetTileValue(tile_map* tileMap, tile_map_position pos)
 {
-    u32 tileChunkValue = GetTileValue(tileMap, pos.absTileX, pos.absTileY, pos.absTileZ);
+    tile_value tileChunkValue = GetTileValue(tileMap, pos.absTileX, pos.absTileY, pos.absTileZ);
     return(tileChunkValue);
 }
 
 internal void
 SetTileValue(memory_arena* arena, tile_map* tileMap,
 		u32 absTileX, u32 absTileY, u32 absTileZ,
-		u32 tileValue)
+		tile_value tileValue)
 {
     //first we get the position of the chunk in the world
     tile_chunk_position chunkPos = GetChunkPositionFor(tileMap, absTileX, absTileY, absTileZ);
@@ -114,10 +114,13 @@ SetTileValue(memory_arena* arena, tile_map* tileMap,
     if (!tileChunk->tiles)
     {
 	u32 tileCount = tileMap->chunkDim * tileMap->chunkDim;
-	tileChunk->tiles = PushArray(arena, tileCount, u32);
+	tileChunk->tiles = PushArray(arena, tileCount, tile_value);
+	tile_value blankTile = {};
+	blankTile.collisionEnabled = false;
+	blankTile.tileTexture = e_tile_texture::blueBackground;
 	for (u32 tileIndex = 0; tileIndex < tileCount; ++tileIndex)
 	{
-	    tileChunk->tiles[tileIndex] = 1;
+	    tileChunk->tiles[tileIndex] = blankTile;
 	}
     }
     SetTileValue(tileMap, tileChunk, chunkPos.relTileX, chunkPos.relTileY, tileValue);
@@ -183,15 +186,15 @@ CenteredTilePoint(u32 absTileX, u32 absTileY, u32 absTileZ)
 }
 
 internal bool32
-IsTileValueEmpty(u32 tileValue)
+IsTileValueEmpty(tile_value tileValue)
 {
-    bool32 empty = (tileValue == 1);
+    bool32 empty = !tileValue.collisionEnabled;
 
     return(empty);
 }
 
 internal void
-SetTileValueFromMouse(game_input* input, game_offscreen_buffer* buffer, tile_map* tileMap, game_state* gameState, i32 tileValue)
+SetTileValueFromMouse(game_input* input, game_offscreen_buffer* buffer, tile_map* tileMap, game_state* gameState, tile_value tileValue)
 {
     i32 tileSideInPixels = 30;
     if ((input->mouseX <= buffer->width) && (input->mouseX >= 0) &&

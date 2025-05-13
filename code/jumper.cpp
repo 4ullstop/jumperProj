@@ -412,7 +412,7 @@ MovePlayer(game_state* gameState, entity* entity, r32 dt, v2 ddP)
 	    for (u32 absTileX = minTileX; absTileX <= maxTileX; ++absTileX)
 	    {
 		tile_map_position testTileP = CenteredTilePoint(absTileX, absTileY, absTileZ);
-		u32 tileValue = GetTileValue(tileMap, testTileP);
+		tile_value tileValue = GetTileValue(tileMap, testTileP);
 
 		if (!IsTileValueEmpty(tileValue))
 		{
@@ -513,11 +513,17 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 	background_bitmaps* background;
 	background = gameState->backgroundBitmaps;
+	background->blueTile = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/blue_background.bmp");
+	background->tileValue.collisionEnabled = true;
+	background->tileValue.tileTexture = e_tile_texture::blueBackground;
+	background++;
 
 	background->blueTile = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/blue_brick_wall.bmp");
+	background->tileValue.collisionEnabled = false;
+	background->tileValue.tileTexture = e_tile_texture::blueBrick;
 
 
-
+	
 	player_bitmap* player;
 	player = gameState->playerBitmaps;
 	player->bitmap = DEBUGLoadBMP(thread, memory->DEBUGPlatformReadEntireFile, "BMP/player_face_forward.bmp");
@@ -604,7 +610,9 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	    {
 		for (u32 tileX = 0; tileX < tilesPerWidth; ++tileX)
 		{
-		    u32 tileValue = 1;
+		    tile_value tileValue = {};
+		    tileValue.collisionEnabled = false;
+		    tileValue.tileTexture = e_tile_texture::blueBackground;
 		    u32 absTileX = screenX * tilesPerWidth + tileX;
 		    u32 absTileY = screenY * tilesPerHeight + tileY;
 
@@ -613,17 +621,18 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    {
 			if (tileY <= 1)
 			{
-			    tileValue = 2;
+			    tileValue.tileTexture = e_tile_texture::blueBrick;
+			    tileValue.collisionEnabled = true;
 			}
 		    }
 		    if ((tileX <= 1) || (tileX == tilesPerWidth - 1) || tileX == tilesPerWidth -2)
 		    {
-			tileValue = 2;
+			tileValue.tileTexture = e_tile_texture::blueBrick;
+			tileValue.collisionEnabled = true;
 		    }
 
 		    SetTileValue(&gameState->worldArena, world->tileMap, absTileX, absTileY, absTileZ, tileValue);
  
-		    serializedChunks[screenIndex][tileY][tileX] = tileValue;
 		    if (openedFile.fileOpened)
 		    {
 			memory->DEBUGPlatformWriteToFile(&openedFile, &tileValue, sizeof(tileValue));
@@ -644,7 +653,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 #if 1 	
 
 	debug_read_file_result result = memory->DEBUGPlatformReadEntireFile(thread, "tilemap_test.map");
-	u32* tileValue = (u32*)result.contents;
+	tile_value* tileValue = (tile_value*)result.contents;
 	for (u32 screenIndex = 0; screenIndex < 100; ++screenIndex)
 	{
 	    for (u32 tileY = 0; tileY < tilesPerHeight; ++tileY)
@@ -737,7 +746,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 				u32 absTileX = screenXVal * tilesPerWidth + tileX;
 				u32 absTileY = screenYVal * tilesPerHeight + tileY;
 
-				u32 tileValue = GetTileValue(tileMap, absTileX, absTileY, 0);
+				tile_value tileValue = GetTileValue(tileMap, absTileX, absTileY, 0);
 				if (unsavedMapFile.fileOpened)
 				{
 				    memory->DEBUGPlatformWriteToFile(&unsavedMapFile, &tileValue, sizeof(tileValue));
@@ -754,14 +763,34 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 		if (input->mouseButtons[0].endedDown)
 		{
-		    SetTileValueFromMouse(input, buffer, tileMap, gameState, 2);
+		    tile_value tile = {};
+		    tile.collisionEnabled = true;
+		    tile.tileTexture = gameState->backgroundBitmaps[gameState->currSelectedTileIndex].tileValue.tileTexture;
+		    SetTileValueFromMouse(input, buffer, tileMap, gameState, tile);
 		}
 
 		if (input->mouseButtons[1].endedDown)
 		{
-		    SetTileValueFromMouse(input, buffer, tileMap, gameState, 1);
+		    tile_value tile = {};
+		    tile.collisionEnabled = true;
+		    tile.tileTexture = gameState->backgroundBitmaps[gameState->currSelectedTileIndex].tileValue.tileTexture;
+
+		    SetTileValueFromMouse(input, buffer, tileMap, gameState, tile);
 		}
-		
+
+		if (controller->actionLeft.endedDown)
+		{
+		    gameState->currSelectedTileIndex++;
+		    if (gameState->currSelectedTileIndex > ArrayCount(gameState->backgroundBitmaps) - 1) gameState->currSelectedTileIndex = 0;
+		    
+		}
+
+		if (controller->actionRight.endedDown)
+		{
+		    gameState->currSelectedTileIndex--;
+		    if (gameState->currSelectedTileIndex < 0) gameState->currSelectedTileIndex = 0;
+			
+		}
 		bool32 movementDetected = false;
 		bool32 jumpInputDetected = false;
 		if (!IsEntityInAir(controllingEntity))
@@ -898,7 +927,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	{
 	    u32 column = gameState->cameraP.absTileX + relColumn;
 	    u32 row = gameState->cameraP.absTileY + relRow;
-	    u32 tileId = GetTileValue(tileMap, column, row, gameState->cameraP.absTileZ);
+	    tile_value tileId = GetTileValue(tileMap, column, row, gameState->cameraP.absTileZ);
 
 	    v2 tileSide = {0.5f * tileSideInPixels, 0.5f * tileSideInPixels};
 	    v2 cen = {screenCenterX - metersToPixels * gameState->cameraP.offset.x +
@@ -907,7 +936,8 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		((r32)relRow) * tileSideInPixels};
 	    v2 min = cen - tileSide;
 	    v2 max = cen + tileSide;
-	    
+
+#if 0	    
 	    if (tileId >= 1)
 	    {
 		r32 gray = 0.5f;
@@ -936,6 +966,15 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		    DrawRectangle(buffer, min, max, gray, gray, gray);
 		}
 	    }
+#else
+
+	    v2 tileLoc = {screenCenterX - metersToPixels * gameState->cameraP.offset.x +
+		((r32)relColumn) * tileSideInPixels,
+		screenCenterY + metersToPixels * gameState->cameraP.offset.y -
+		((r32)relRow) * tileSideInPixels};		    
+	    background_bitmaps* background = &gameState->backgroundBitmaps[tileId.tileTexture];
+	    DrawBackgroundTile(buffer, &background->blueTile, min, max);
+#endif	    
 	}
     }
 

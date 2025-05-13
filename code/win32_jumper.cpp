@@ -730,6 +730,14 @@ Win32ProcessPendingMessages(win32_state* win32State, game_controller_input* keyb
 		    Win32ProcessKeyboardMessage(&keyboardController->start, isDown, wasDown);
 		}
 #if JUMPER_INTERNAL
+		else if (VKCode == VK_LEFT)
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->actionLeft, isDown, wasDown);
+		}
+		else if (VKCode == VK_RIGHT)
+		{
+		    Win32ProcessKeyboardMessage(&keyboardController->actionRight, isDown, wasDown);		    
+		}
 		else if (VKCode == 'P')
 		{
 		    if (isDown)

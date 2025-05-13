@@ -293,6 +293,7 @@ struct background_bitmaps
     i32 alignY;
 
     loaded_bitmap blueTile;
+    tile_value tileValue;   
 };
 
 struct player_bitmap
@@ -301,6 +302,7 @@ struct player_bitmap
     i32 alignY;    
 
     loaded_bitmap bitmap;
+
 };
 
 enum e_player_bitmap_location : u8
@@ -352,13 +354,16 @@ struct game_state
     u32 entityCount;
     entity entities[256];
 
-    background_bitmaps backgroundBitmaps[1];
-    player_bitmap playerBitmaps[1];
+    background_bitmaps backgroundBitmaps[2];
+    player_bitmap playerBitmaps[2];
 
-
-
+    
+    i32 currSelectedTileIndex;
+    
     player_bitmap playerAnimations[4];
     player_bitmap* currentPlayerBitmap;
+
+    
 };
 
 #define JUMPER_H
