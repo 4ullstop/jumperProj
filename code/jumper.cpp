@@ -522,6 +522,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	background->tileValue.collisionEnabled = false;
 	background->tileValue.tileTexture = e_tile_texture::blueBrick;
 
+	gameState->currSelectedTileIndex = 1;
 
 	
 	player_bitmap* player;
@@ -530,6 +531,8 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	player->alignX = 15;
 	player->alignY = 23;
 
+	
+	
 	AddEntity(gameState);
 	
 	gameState->cameraP.absTileX = 33/2;
@@ -772,7 +775,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		if (input->mouseButtons[1].endedDown)
 		{
 		    tile_value tile = {};
-		    tile.collisionEnabled = true;
+		    tile.collisionEnabled = false;
 		    tile.tileTexture = gameState->backgroundBitmaps[gameState->currSelectedTileIndex].tileValue.tileTexture;
 
 		    SetTileValueFromMouse(input, buffer, tileMap, gameState, tile);
